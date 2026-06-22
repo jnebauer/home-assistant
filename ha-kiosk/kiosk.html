@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1024,initial-scale=1"/>
+<title>Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ============ RESET + BASE ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body,#app{width:1024px;height:600px;overflow:hidden;background:#0a1330;
+  font-family:'Manrope',sans-serif;color:#f3f6ff;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+button:disabled{cursor:not-allowed}
+
+/* ============ CSS VARIABLES ============ */
+:root{
+  --bg-grad:linear-gradient(158deg,#0f1c40 0%,#0a1330 55%,#0b1733 100%);
+  --tp:#f3f6ff; --tm:#9fb0d8; --td:#8ea0cc; --ts:#cdd6ee;
+  --glass:rgba(255,255,255,.06); --gb:rgba(255,255,255,.11);
+  --cyan:#38e0ff; --teal:#2dd4bf; --teal2:#5eead4;
+  --amber:#ffae3d; --amber2:#ffc878;
+  --red:#ff5d6c; --red2:#ff9aa5;
+  --indigo:#7c83ff; --indigoDk:#5b62d6;
+  --sky:#7fc4ff;
+  --nav-h:52px;
+}
+
+/* ============ LAYOUT ============ */
+#app{position:relative;background:var(--bg-grad)}
+#app::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 560px 320px at 20% 10%,rgba(56,118,222,.35) 0%,transparent 70%),
+    radial-gradient(ellipse 400px 280px at 80% 80%,rgba(34,176,140,.28) 0%,transparent 70%),
+    radial-gradient(ellipse 300px 200px at 65% 5%,rgba(96,66,200,.30) 0%,transparent 70%)}
+#content{position:absolute;top:0;left:0;right:0;bottom:var(--nav-h);
+  padding:13px 15px 10px;z-index:1;display:flex;flex-direction:column}
+#nav{position:absolute;bottom:0;left:0;right:0;height:var(--nav-h);
+  background:rgba(8,14,32,.82);backdrop-filter:blur(24px);
+  border-top:1px solid rgba(255,255,255,.09);
+  display:flex;align-items:stretch;z-index:10}
+
+/* ============ NAV TABS ============ */
+.nav-tab{flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;
+  gap:8px;background:none;border:none;color:var(--td);
+  font-size:14px;font-weight:700;letter-spacing:.3px;
+  position:relative;transition:color .2s;padding:0}
+.nav-tab svg{width:20px;height:20px;stroke-width:1.7;fill:none;stroke:currentColor}
+.nav-tab.active{color:var(--cyan)}
+.nav-tab.active::before{content:'';position:absolute;top:0;left:20%;right:20%;
+  height:3px;background:var(--cyan);border-radius:0 0 3px 3px}
+
+/* ============ GLASS ============ */
+.glass{background:var(--glass);border:1px solid var(--gb);
+  backdrop-filter:blur(22px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+
+/* ============ ANIMATIONS ============ */
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes glowAmber{0%,100%{box-shadow:0 0 7px rgba(255,174,61,.5)}50%{box-shadow:0 0 18px rgba(255,174,61,.9)}}
+@keyframes flowDash{0%{stroke-dashoffset:24}100%{stroke-dashoffset:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ============ SHARED ============ */
+.label-caps{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--tm)}
+.pill-switch{width:44px;height:25px;border-radius:99px;position:relative;
+  border:none;transition:background .2s;flex-shrink:0;padding:0;display:inline-block}
+.pill-switch.on{background:var(--teal)}
+.pill-switch.off{background:rgba(255,255,255,.15)}
+.pill-switch::after{content:'';position:absolute;top:3px;width:19px;height:19px;
+  border-radius:50%;background:#fff;transition:left .2s}
+.pill-switch.on::after{left:22px}
+.pill-switch.off::after{left:3px}
+
+/* ============ LOADING ============ */
+#loading{display:flex;align-items:center;justify-content:center;gap:8px;height:100%;
+  font-size:14px;color:var(--tm)}
+.ldot{width:8px;height:8px;border-radius:50%;background:var(--cyan);
+  animation:livePulse 1.2s ease-in-out infinite}
+.ldot:nth-child(2){animation-delay:.2s}
+.ldot:nth-child(3){animation-delay:.4s}
+
+/* ============ HOME TAB ============ */
+.home-header{display:flex;align-items:stretch;justify-content:space-between;gap:10px;flex-shrink:0}
+.clock-block{display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0}
+.clock-time{font-family:'Space Grotesk',sans-serif;font-size:54px;font-weight:600;
+  line-height:1;letter-spacing:-1px;color:var(--tp)}
+.clock-ampm{font-size:16px;font-weight:600;color:var(--tm);padding-bottom:6px}
+.clock-sec{font-size:12px;color:var(--td)}
+.clock-date{font-size:13px;color:var(--tm);letter-spacing:.3px;margin-top:2px}
+.header-cluster{display:flex;gap:9px;align-items:stretch}
+
+/* Security mini card (combined alarm + motion) */
+.security-mini{padding:10px 13px;border-radius:16px;display:flex;flex-direction:column;gap:7px;justify-content:center;cursor:pointer;min-width:160px}
+.sec-mini-divider{height:1px;background:rgba(255,255,255,.09)}
+.pir-row{display:flex;align-items:center;gap:6px}
+.pir-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .3s}
+.pir-dot.active{background:var(--amber);animation:glowAmber 1.4s ease-in-out infinite}
+.pir-dot.clear{background:var(--teal);box-shadow:0 0 6px rgba(45,212,191,.5)}
+.pir-label{font-size:11px;font-weight:600}
+.pir-label.active{color:var(--amber2)}
+.pir-label.clear{color:var(--ts)}
+
+/* Alarm status */
+.alarm-status{font-size:12px;font-weight:600}
+.alarm-status.armed{color:var(--teal)}
+.alarm-status.disarmed{color:var(--td)}
+
+/* Weather card */
+.weather-card{padding:12px 18px;border-radius:16px;display:flex;flex-direction:column;gap:6px;justify-content:center;min-width:155px}
+.weather-temp{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:600;color:var(--tp)}
+.weather-cond{font-size:12px;color:var(--tm);line-height:1.4}
+
+/* Body row */
+.home-body{display:flex;gap:10px;flex:1;min-height:0;margin-top:9px}
+
+/* Climate panel */
+.climate-panel{flex:1.9;padding:11px 13px;display:flex;flex-direction:column;gap:8px;min-height:0;border-radius:18px}
+.climate-header{display:flex;align-items:center;justify-content:space-between}
+.climate-grid{display:grid;gap:7px;flex:1;min-height:0;overflow-y:auto}
+.climate-grid.compact{grid-template-columns:repeat(2,1fr)}
+.climate-grid.expanded{grid-template-columns:repeat(4,1fr)}
+.zone-tile{border-radius:12px;padding:8px 9px;display:flex;flex-direction:column;gap:5px;transition:all .2s}
+.zone-tile.on{background:rgba(56,224,255,.08);border:1px solid rgba(56,224,255,.25);box-shadow:0 0 12px rgba(56,224,255,.1)}
+.zone-tile.off{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)}
+.zone-header{display:flex;align-items:center;justify-content:space-between}
+.zone-name{font-size:13px;font-weight:700}
+.zone-name.on{color:var(--tp)}
+.zone-name.off{color:var(--tm)}
+.zone-pwr{width:30px;height:30px;border-radius:9px;border:none;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.zone-pwr.on{background:var(--teal);box-shadow:0 0 10px rgba(45,212,191,.5)}
+.zone-pwr.off{background:rgba(255,255,255,.1)}
+.zone-controls{display:flex;align-items:center;gap:5px}
+.zone-btn{width:36px;height:36px;border-radius:11px;border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.1);color:var(--tp);font-size:22px;font-weight:300;
+  display:flex;align-items:center;justify-content:center;line-height:1}
+.zone-set{flex:1;text-align:center}
+.zone-set-temp{font-family:'Space Grotesk',sans-serif;font-size:25px;font-weight:600;color:var(--tp);line-height:1}
+.zone-cur{font-size:10px;color:var(--cyan);margin-top:2px}
+.zone-off-row{display:flex;align-items:center;justify-content:space-between}
+.zone-off-label{font-size:11px;color:var(--td)}
+.zone-cur-off{font-size:11px;color:var(--tm)}
+
+/* Right column */
+.right-col{flex:1.2;display:flex;flex-direction:column;gap:8px;min-height:0}
+
+/* Camera grid */
+.cam-grid{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:6px;flex:1;min-height:0}
+.cam-tile{background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px),
+    linear-gradient(135deg,rgba(10,18,42,.9),rgba(15,28,64,.8));
+  border:1px solid rgba(255,255,255,.09);border-radius:10px;
+  position:relative;overflow:hidden}
+.cam-live{position:absolute;top:6px;left:7px;display:flex;align-items:center;gap:4px;
+  background:rgba(0,0,0,.55);border-radius:99px;padding:3px 7px}
+.cam-live-dot{width:5px;height:5px;border-radius:50%;background:var(--red);
+  animation:livePulse 1.6s ease-in-out infinite}
+.cam-live-text{font-size:9px;font-weight:800;letter-spacing:1px;color:#fff}
+.cam-name{position:absolute;bottom:5px;left:7px;font-size:10px;font-weight:700;
+  color:rgba(255,255,255,.7);letter-spacing:.5px}
+.cam-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:.18}
+
+/* Garage doors */
+.garage-row{display:flex;gap:7px;flex-shrink:0;height:72px}
+.garage-card{flex:1;padding:7px 11px;border-radius:12px;display:flex;flex-direction:column;gap:4px}
+.garage-top{display:flex;align-items:center;justify-content:space-between}
+.garage-name{font-size:11px;font-weight:700;color:var(--tp)}
+.garage-status{font-size:10px;font-weight:600;margin-top:2px}
+.garage-status.open{color:var(--red)}
+.garage-status.closed{color:var(--teal)}
+.garage-btns{display:flex;gap:4px}
+.garage-btn{flex:1;padding:4px 0;border-radius:7px;font-size:11px;font-weight:700;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:var(--tm);transition:all .15s}
+.garage-btn.open-active{border-color:rgba(255,93,108,.4);background:rgba(255,93,108,.18);color:var(--red2)}
+.garage-btn.close-active{border-color:rgba(45,212,191,.4);background:rgba(45,212,191,.12);color:var(--teal2)}
+
+/* Battery card */
+.battery-card{padding:12px 14px;border-radius:14px;display:flex;flex-direction:column;gap:8px;flex:1;min-height:90px}
+.battery-row{display:flex;align-items:center;justify-content:space-between}
+.battery-val{font-size:12px;color:var(--teal);font-weight:700}
+.battery-bar-bg{height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}
+.battery-bar-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal2));border-radius:4px;transition:width .5s ease}
+
+/* Scene bar */
+.scene-bar{display:flex;gap:7px;height:66px;flex-shrink:0;margin-top:9px}
+.scene-btn{flex:1;border-radius:13px;border:1px solid rgba(255,255,255,.11);
+  background:rgba(255,255,255,.06);color:var(--tm);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;transition:all .2s;font-size:10px;font-weight:700;letter-spacing:.5px}
+.scene-btn.good-night{background:linear-gradient(135deg,var(--indigo),var(--indigoDk));
+  border-color:rgba(124,131,255,.3);color:var(--tp);box-shadow:0 4px 16px rgba(92,98,214,.4)}
+.scene-btn.active:not(.good-night){background:rgba(56,224,255,.15);border-color:rgba(56,224,255,.4);color:var(--cyan)}
+.scene-btn.active.good-night{background:linear-gradient(135deg,#9b6fff,#6b52d6)}
+.scene-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
+
+/* ============ ROOMS TAB ============ */
+.tab-title{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:600;color:var(--tp)}
+.tab-sub{font-size:12px;color:var(--tm);margin-top:2px}
+.rooms-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:8px;flex:1;min-height:0;margin-top:8px}
+.room-card{border-radius:14px;padding:11px 12px 10px;display:flex;flex-direction:column;gap:7px;
+  transition:all .2s;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05)}
+.room-card.on{border-color:rgba(255,255,255,.25)}
+.room-top{display:flex;align-items:center;gap:8px}
+.room-icon-wrap{width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center}
+.room-icon-wrap svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+.room-name{font-size:13px;font-weight:700;color:var(--tp);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.room-devices{font-size:10px;color:var(--td);margin-top:1px}
+.room-temp{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;color:var(--sky);flex-shrink:0;margin-left:auto}
+.room-light-row{display:flex;align-items:center;justify-content:space-between}
+.room-light-label{font-size:11px;color:var(--tm);font-weight:600}
+
+/* ============ SECURITY TAB ============ */
+.security-body{display:flex;gap:12px;flex:1;min-height:0;margin-top:11px}
+.big-cam-grid{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:8px;flex:1.5;min-height:0}
+.big-cam-tile{background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px),
+    linear-gradient(135deg,rgba(10,18,42,.9),rgba(15,28,64,.85));
+  border:1px solid rgba(255,255,255,.09);border-radius:14px;position:relative;overflow:hidden}
+.big-cam-live{position:absolute;top:9px;left:10px;display:flex;align-items:center;gap:5px;
+  background:rgba(0,0,0,.55);border-radius:99px;padding:4px 9px}
+.big-cam-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:livePulse 1.6s ease-in-out infinite}
+.big-cam-live-text{font-size:10px;font-weight:800;letter-spacing:1px;color:#fff}
+.big-cam-name{position:absolute;bottom:8px;left:10px;font-size:12px;font-weight:700;
+  color:rgba(255,255,255,.8);letter-spacing:.5px}
+.big-cam-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:.15}
+.sec-right{flex:1;display:flex;flex-direction:column;gap:9px}
+.sec-garage-row{display:flex;gap:8px}
+.sec-garage-card{flex:1;padding:12px 13px;border-radius:14px;display:flex;flex-direction:column;gap:7px;cursor:pointer}
+.sec-garage-name{font-size:13px;font-weight:700;color:var(--tp)}
+.sec-garage-status{font-size:13px;font-weight:600}
+.sec-garage-hint{font-size:11px;color:var(--td)}
+.motion-card{padding:12px 13px;border-radius:14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.motion-row{display:flex;align-items:center;gap:9px}
+.motion-icon-wrap{width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:all .2s}
+.motion-icon-wrap svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
+.motion-name{font-size:13px;font-weight:600;color:var(--tp)}
+.motion-status{font-size:11px;margin-top:2px}
+.motion-status.active{color:var(--amber)}
+.motion-status.clear{color:var(--td)}
+.motion-status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-left:auto;transition:all .2s}
+.motion-status-dot.active{background:var(--amber);box-shadow:0 0 12px rgba(255,174,61,.7);animation:glowAmber 1.4s ease-in-out infinite}
+.motion-status-dot.clear{background:var(--teal);box-shadow:0 0 6px rgba(45,212,191,.5)}
+.alarm-stub{padding:12px 13px;border-radius:14px;flex-shrink:0}
+.alarm-stub-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--tm);margin-bottom:6px}
+.alarm-stub-body{font-size:12px;color:var(--td);line-height:1.5}
+
+/* ============ ENERGY TAB ============ */
+.energy-body{display:flex;gap:13px;flex:1;min-height:0;margin-top:11px}
+.flow-panel{flex:1.3;border-radius:18px;padding:14px;display:flex;align-items:center;justify-content:center;position:relative}
+.flow-pending{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:8px;border-radius:18px;
+  background:rgba(10,19,48,.6);backdrop-filter:blur(4px);z-index:2}
+.flow-pending-icon svg{width:32px;height:32px;fill:none;stroke:var(--amber);stroke-width:1.5}
+.flow-pending-title{font-size:14px;font-weight:600;color:var(--tm)}
+.flow-pending-body{font-size:11px;color:var(--td);text-align:center;max-width:200px;line-height:1.5}
+.energy-right{flex:1;display:flex;flex-direction:column;gap:10px}
+.solar-card{flex:1.4;border-radius:16px;padding:15px 17px;display:flex;flex-direction:column;gap:5px;justify-content:center}
+.solar-val{font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:600;line-height:1}
+.solar-unit{font-size:13px;color:var(--tm)}
+.bat-energy-card{border-radius:14px;padding:11px 13px;display:flex;flex-direction:column;gap:7px}
+.energy-small-row{display:flex;gap:9px}
+.energy-small-card{flex:1;border-radius:14px;padding:11px 13px}
+.energy-small-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--tm);margin-bottom:5px}
+.energy-small-val{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600}
+.energy-small-unit{font-size:11px;color:var(--td);margin-top:2px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="loading">
+    <div class="ldot"></div>
+    <div class="ldot"></div>
+    <div class="ldot"></div>
+    <span style="margin-left:8px">Connecting to Home Assistant…</span>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ================================================================
+// CONFIG — all entity IDs discovered from HA on 2026-06-21
+// ================================================================
+const C = {
+  climate: {
+    master:'climate.master', kitchen:'climate.kitchen', dining:'climate.dining',
+    tv_room:'climate.tv_room', char:'climate.char', ella:'climate.ella',
+    josh:'climate.josh', study:'climate.study'
+  },
+  lights: {
+    lounge:'light.lounge_light_downlights', wall:'light.wall_lights',
+    kitchen:'light.kitchen_light_downlights', kitchen_p:'light.kitchen_light_pendants',
+    dining:'light.dining_lights',
+    dining_down:'light.dining_light_downlights', dining_pendant:'light.dining_light_pendant',
+    hallway:'light.hallway_light_downlights', piano:'light.hallway_light_piano_nook',
+    tv_led:'light.tv_led_strip', tv_wall:'light.tv_wall_lights',
+    pool:'light.pool_light', pool_flood:'light.pool_flood_light',
+    alfresco:'light.alfresco_downlight', garden:'light.garden_lights',
+    front:'light.outside_light_guest', clothesline:'light.clothesline_light',
+  },
+  scenes: {
+    good_night:'scene.good_night', good_morning:'scene.good_morning',
+    dinner:'scene.dinner', entertain:'scene.entertain',
+    movie:'scene.movie', night_light:'scene.night_light',
+  },
+  garage_chermside: 'cover.smart_garage_door_24070334243323610701c4e7ae05c55e_garage',
+  garage_julia: null, // not yet installed
+  dampers: {
+    master:'cover.master_damper', kitchen:'cover.kitchen_damper',
+    dining:'cover.dining_damper', tv_room:'cover.tv_room_damper',
+    char:'cover.char_damper', ella:'cover.ella_damper',
+    josh:'cover.josh_damper', study:'cover.study_damper',
+  },
+  pir: {
+    kitchen:'binary_sensor.kitchen_pir_sensor',
+    piano:'binary_sensor.piano_hall_pir_sensor',
+    hallway:'binary_sensor.back_hallway_pir_sensor',
+  },
+  cameras: {
+    chermside:'camera.chermside_st',
+    julia:'camera.julia_st',
+    garage:null, pool:null // UniFi G5 Bullets — add after go2rtc setup
+  },
+  weather:'weather.forecast_home',
+  alarm:null, // Inception not yet integrated
+  energy: {
+    solar_power:null, battery_soc:null, battery_power:null,
+    grid_power:null, yield_today:null // all null until Sigenergy connected
+  }
+};
+
+const ZONES = [
+  {id:'master', name:'Master',  entity:'climate.master',  common:true},
+  {id:'kitchen',name:'Kitchen', entity:'climate.kitchen', common:true},
+  {id:'dining', name:'Dining',  entity:'climate.dining',  common:true},
+  {id:'tv_room',name:'TV Room', entity:'climate.tv_room', common:true},
+  {id:'char',   name:'Char',    entity:'climate.char',    common:false},
+  {id:'ella',   name:'Ella',    entity:'climate.ella',    common:false},
+  {id:'josh',   name:'Josh',    entity:'climate.josh',    common:false},
+  {id:'study',  name:'Study',   entity:'climate.study',   common:false},
+];
+
+const ROOMS = [
+  {id:'lounge',  name:'Lounge',     color:'#ff8a3d', icon:'sofa',    lights:['light.lounge_light_downlights','light.wall_lights'],                climate:null,             devices:'2 lights'},
+  {id:'kitchen', name:'Kitchen',    color:'#34d399', icon:'chef',    lights:['light.kitchen_light_downlights','light.kitchen_light_pendants'],    climate:'climate.kitchen',devices:'2 lights · AC'},
+  {id:'master',  name:'Master Bed', color:'#a78bfa', icon:'bed',     lights:[],                                                                   climate:'climate.master', devices:'AC'},
+  {id:'dining',  name:'Dining',     color:'#38bdf8', icon:'dining',  lights:['light.dining_lights'],                                              climate:'climate.dining', devices:'1 light · AC'},
+  {id:'ella',    name:"Ella's Rm",  color:'#e879f9', icon:'bed',     lights:[],                                                                   climate:'climate.ella',   devices:'AC'},
+  {id:'char',    name:"Char's Rm",  color:'#f472b6', icon:'bed',     lights:[],                                                                   climate:'climate.char',   devices:'AC'},
+  {id:'josh',    name:"Josh's Rm",  color:'#60a5fa', icon:'bed',     lights:[],                                                                   climate:'climate.josh',   devices:'AC'},
+  {id:'outdoor', name:'Outdoor',    color:'#6ee7b7', icon:'trees',   lights:['light.pool_light','light.alfresco_downlight','light.garden_lights'], climate:null,             devices:'3+ lights'},
+];
+
+const SCENE_BTNS = [
+  {id:'good_night',   label:'Good Night',   icon:'moon',    entity:'scene.good_night',   prominent:true},
+  {id:'good_morning', label:'Good Morning', icon:'sunrise', entity:'scene.good_morning'},
+  {id:'dinner',       label:'Dinner',       icon:'fork',    entity:'scene.dinner'},
+  {id:'entertain',    label:'Entertain',    icon:'music',   entity:'scene.entertain'},
+  {id:'movie',        label:'Movie',        icon:'film',    entity:'scene.movie'},
+  {id:'night_light',  label:'Night Light',  icon:'lamp',    entity:'scene.night_light'},
+];
+
+// ================================================================
+// STATE
+// ================================================================
+const state = {
+  tab: 'home',
+  ready: false,
+  entities: new Map(),        // entity_id → {state, attributes}
+  activeScene: null,
+  zonesExpanded: false,
+  alarmArmed: false,          // local until Inception integrated
+};
+
+// ================================================================
+// HA WEBSOCKET
+// ================================================================
+class HAWebSocket {
+  constructor() {
+    this.ws = null; this.msgId = 1; this.pending = new Map();
+    this.listeners = new Map(); this.globalCbs = new Set();
+    this.token = null; this.reconnTimer = null; this.ready = false;
+    this.onReadyCbs = [];
+  }
+  connect(token) { this.token = token; this._connect(); }
+  onReady(cb) { this.ready ? cb() : this.onReadyCbs.push(cb); }
+  _connect() {
+    clearTimeout(this.reconnTimer);
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    this.ws = new WebSocket(`${proto}//${location.host}/api/websocket`);
+    this.ws.onmessage = e => this._msg(JSON.parse(e.data));
+    this.ws.onerror = () => {};
+    this.ws.onclose = () => { this.reconnTimer = setTimeout(() => this._connect(), 4000); };
+  }
+  _send(obj) { this.ws.readyState === 1 && this.ws.send(JSON.stringify(obj)); }
+  _cmd(obj) {
+    const id = this.msgId++;
+    return new Promise(res => { this.pending.set(id, res); this._send({id, ...obj}); });
+  }
+  _msg(m) {
+    if (m.type === 'auth_required') this._send({type:'auth', access_token:this.token});
+    else if (m.type === 'auth_ok') this._init();
+    else if (m.type === 'result') { const r = this.pending.get(m.id); r && (r(m), this.pending.delete(m.id)); }
+    else if (m.type === 'event' && m.event?.event_type === 'state_changed') {
+      const {entity_id, new_state} = m.event.data;
+      if (new_state) { state.entities.set(entity_id, new_state); this._notify(entity_id, new_state); }
+    }
+  }
+  async _init() {
+    const r = await this._cmd({type:'get_states'});
+    r.result?.forEach(s => state.entities.set(s.entity_id, s));
+    this._send({id:this.msgId++, type:'subscribe_events', event_type:'state_changed'});
+    this.ready = true; this.onReadyCbs.forEach(cb => cb()); this.onReadyCbs = [];
+  }
+  _notify(id, s) {
+    this.listeners.get(id)?.forEach(cb => cb(s));
+    this.globalCbs.forEach(cb => cb(id, s));
+  }
+  sub(id, cb) { if (!this.listeners.has(id)) this.listeners.set(id, new Set()); this.listeners.get(id).add(cb); return () => this.listeners.get(id).delete(cb); }
+  subAll(cb) { this.globalCbs.add(cb); return () => this.globalCbs.delete(cb); }
+  callSvc(domain, svc, data={}, target=null) {
+    const msg = {type:'call_service', domain, service:svc, service_data:data};
+    if (target) msg.target = target;
+    return this._cmd(msg);
+  }
+  st(id) { return state.entities.get(id); }
+  val(id) { return state.entities.get(id)?.state ?? 'unknown'; }
+  attr(id, a) { return state.entities.get(id)?.attributes?.[a]; }
+  on(id) { const s = this.val(id); return s !== 'off' && s !== 'unavailable' && s !== 'unknown'; }
+  turnOn(id, d={}) { return this.callSvc(id.split('.')[0],'turn_on',d,{entity_id:id}); }
+  turnOff(id, d={}) { return this.callSvc(id.split('.')[0],'turn_off',d,{entity_id:id}); }
+  scene(id) { return this.callSvc('scene','turn_on',{},{entity_id:id}); }
+  hvacMode(id, mode) { return this.callSvc('climate','set_hvac_mode',{hvac_mode:mode},{entity_id:id}); }
+  setTemp(id, t) { return this.callSvc('climate','set_temperature',{temperature:t},{entity_id:id}); }
+  openCover(id) { return this.callSvc('cover','open_cover',{},{entity_id:id}); }
+  closeCover(id) { return this.callSvc('cover','close_cover',{},{entity_id:id}); }
+}
+const ha = new HAWebSocket();
+
+// ================================================================
+// ICONS (inline SVG strings)
+// ================================================================
+const I = {
+  home: `<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  rooms:`<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`,
+  sec:  `<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  bolt: `<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  therm:`<svg viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>`,
+  power:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  cam:  `<svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`,
+  car:  `<svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
+  bat:  `<svg viewBox="0 0 24 24"><rect x="2" y="7" width="16" height="10" rx="2"/><line x1="22" y1="11" x2="22" y2="13"/></svg>`,
+  cloud:`<svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`,
+  shield:`<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  moon: `<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  sun:  `<svg viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="2" y1="18" x2="4" y2="18"/><line x1="20" y1="18" x2="22" y2="18"/><line x1="19.78" y1="10.22" x2="18.36" y2="11.64"/></svg>`,
+  fork: `<svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><line x1="7" y1="2" x2="7" y2="11"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/></svg>`,
+  music:`<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+  film: `<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>`,
+  lamp: `<svg viewBox="0 0 24 24"><path d="M8 2h8l4 10H4L8 2z"/><path d="M12 12v6"/><path d="M8 22h8"/></svg>`,
+  sofa: `<svg viewBox="0 0 24 24"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0v5z"/><line x1="6" y1="18" x2="6" y2="22"/><line x1="18" y1="18" x2="18" y2="22"/></svg>`,
+  chef: `<svg viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>`,
+  bed:  `<svg viewBox="0 0 24 24"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>`,
+  dining:`<svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><line x1="7" y1="2" x2="7" y2="11"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/></svg>`,
+  tv:   `<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  trees:`<svg viewBox="0 0 24 24"><path d="M17 14l3-3.19a1 1 0 0 0 0-1.42L12 2 4 9.39a1 1 0 0 0 0 1.42L7 14"/><path d="M14 21v-5a2 2 0 0 0-2-2h0a2 2 0 0 0-2 2v5"/><path d="M3 14h18"/><path d="M3 18h18"/></svg>`,
+  motion:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 0 0 0 11.31M17.7 6.3a8 8 0 0 1 0 11.31M3.5 3.5a12 12 0 0 0 0 16.97M20.5 3.5a12 12 0 0 1 0 16.97"/></svg>`,
+};
+function icon(name, w=16, h=16, extra='') {
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${w}px;height:${h}px;${extra}">${I[name]||''}</span>`;
+}
+
+// ================================================================
+// CLOCK
+// ================================================================
+let clockTick;
+function startClock() {
+  clearInterval(clockTick);
+  function update() {
+    const n = new Date();
+    const h = n.getHours(), m = n.getMinutes(), s = n.getSeconds();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = (h % 12 || 12);
+    const mp = String(m).padStart(2,'0'), sp = String(s).padStart(2,'0');
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const dateStr = `${days[n.getDay()]}, ${n.getDate()} ${months[n.getMonth()]}`;
+    const el = document.getElementById('clock-time');
+    if (el) el.innerHTML = `<span class="clock-time">${h12}:${mp}<span style="display:inline-flex;flex-direction:column;font-size:14px;padding-bottom:6px;margin-left:6px;vertical-align:bottom"><span class="clock-ampm">${ampm}</span><span class="clock-sec">${sp}s</span></span></span><div class="clock-date">${dateStr}</div>`;
+  }
+  update(); clockTick = setInterval(update, 1000);
+}
+
+// ================================================================
+// RENDER HELPERS
+// ================================================================
+function liveChip(label, entity) {
+  const active = ha.val(entity) === 'on';
+  return `<div class="pir-row">
+    <div class="pir-dot ${active?'active':'clear'}"></div>
+    <span class="pir-label ${active?'active':'clear'}">${label}</span>
+  </div>`;
+}
+
+function camTile(label, entity, big=false) {
+  const cls = big ? 'big-cam-tile' : 'cam-tile';
+  const liveCls = big ? 'big-cam-live' : 'cam-live';
+  const dotCls  = big ? 'big-cam-dot' : 'cam-live-dot';
+  const textCls = big ? 'big-cam-live-text' : 'cam-live-text';
+  const nameCls = big ? 'big-cam-name' : 'cam-name';
+  const iconCls = big ? 'big-cam-icon' : 'cam-icon';
+  return `<div class="${cls}">
+    <div class="${iconCls}">${icon('cam',big?38:26,big?38:26)}</div>
+    <div class="${liveCls}"><div class="${dotCls}"></div><span class="${textCls}">LIVE</span></div>
+    <div class="${nameCls}">${label}</div>
+  </div>`;
+}
+
+// ================================================================
+// HOME TAB
+// ================================================================
+function renderHome() {
+  // Combined security mini card (alarm + motion)
+  const alarmCol = state.alarmArmed ? 'var(--teal)' : 'var(--td)';
+  const secMiniHTML = `
+    <div class="security-mini glass" id="alarm-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div style="display:flex;align-items:center;gap:7px">
+          ${I.shield.replace('<svg','<svg width="16" height="16" fill="none" stroke="'+alarmCol+'" stroke-width="1.8"')}
+          <div style="line-height:1.15">
+            <div class="label-caps">Alarm</div>
+            <div class="alarm-status ${state.alarmArmed?'armed':'disarmed'}">
+              ${C.alarm ? (state.alarmArmed ? 'Armed' : 'Disarmed') : 'Not set up'}
+            </div>
+          </div>
+        </div>
+        <button class="pill-switch ${state.alarmArmed?'on':'off'}" id="alarm-toggle"></button>
+      </div>
+      <div class="sec-mini-divider"></div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${liveChip('Kitchen', C.pir.kitchen)}
+        ${liveChip('Piano Nook', C.pir.piano)}
+        ${liveChip('Hallway', C.pir.hallway)}
+      </div>
+    </div>`;
+
+  // Weather
+  const wSt = ha.st(C.weather);
+  const wTemp = wSt?.attributes?.temperature ?? '--';
+  const wCond = (wSt?.state ?? 'unknown').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  const weatherHTML = `
+    <div class="weather-card glass">
+      ${icon('cloud',28,28,'color:var(--sky)')}
+      <div class="weather-temp">${wTemp}°</div>
+      <div class="weather-cond">${wCond}<br>Highgate Hill</div>
+    </div>`;
+
+  // Climate zones
+  const visZones = state.zonesExpanded ? ZONES : ZONES.filter(z=>z.common);
+  const onCount = ZONES.filter(z=>ha.on(z.entity)).length;
+  const zoneGrid = visZones.map(z=>{
+    const on = ha.on(z.entity);
+    const setT = ha.attr(z.entity,'temperature') ?? 22;
+    const curT = ha.attr(z.entity,'current_temperature') ?? '--';
+    return `<div class="zone-tile ${on?'on':'off'}" data-zone="${z.entity}">
+      <div class="zone-header">
+        <span class="zone-name ${on?'on':'off'}">${z.name}</span>
+        <button class="zone-pwr ${on?'on':'off'}" data-zone-toggle="${z.entity}" title="${on?'Turn off':'Turn on'}">
+          ${I.power.replace('<svg','<svg width="12" height="12" fill="none" stroke="'+(on?'#0a1330':'#cdd6ee')+'" stroke-width="2.5"')}
+        </button>
+      </div>
+      ${on
+        ? `<div class="zone-controls">
+            <button class="zone-btn" data-zone-temp="${z.entity}" data-delta="-1">−</button>
+            <div class="zone-set">
+              <div class="zone-set-temp">${setT}°</div>
+              <div class="zone-cur">Now ${curT}°</div>
+            </div>
+            <button class="zone-btn" data-zone-temp="${z.entity}" data-delta="1">+</button>
+          </div>`
+        : `<div class="zone-off-row"><span class="zone-off-label">Off</span><span class="zone-cur-off">Now ${curT}°</span></div>`
+      }
+    </div>`;
+  }).join('');
+
+  // Garage
+  const chState = ha.val(C.garage_chermside);
+  const chOpen = chState === 'open' || chState === 'opening';
+  const garageHTML = `<div class="garage-row">
+    <div class="garage-card glass">
+      <div class="garage-top">
+        <div>
+          <div class="garage-name">Chermside</div>
+          <div class="garage-status ${chOpen?'open':'closed'}">${chState}</div>
+        </div>
+        ${icon('car',17,17,'color:var(--tm)')}
+      </div>
+      <div class="garage-btns">
+        <button class="garage-btn ${chOpen?'open-active':''}" id="ch-open">▲ Open</button>
+        <button class="garage-btn ${!chOpen?'close-active':''}" id="ch-close">▼ Close</button>
+      </div>
+    </div>
+    <div class="garage-card glass" style="opacity:.42;pointer-events:none">
+      <div class="garage-top">
+        <div>
+          <div class="garage-name">Julia St</div>
+          <div class="garage-status" style="color:var(--td)">Not installed</div>
+        </div>
+        ${icon('car',17,17,'color:var(--tm)')}
+      </div>
+      <div class="garage-btns">
+        <button class="garage-btn" disabled>▲ Open</button>
+        <button class="garage-btn" disabled>▼ Close</button>
+      </div>
+    </div>
+  </div>`;
+
+  // Battery
+  const soc = C.energy.battery_soc ? parseFloat(ha.val(C.energy.battery_soc)) : null;
+  const batKW = C.energy.battery_power ? parseFloat(ha.val(C.energy.battery_power)) : null;
+  const socPct = soc !== null ? Math.round(soc) : null;
+  const battHTML = `<div class="battery-card glass">
+    <div style="display:flex;align-items:center;gap:11px">
+      <div style="width:36px;height:36px;flex-shrink:0;border-radius:11px;background:#2dd4bf;display:flex;align-items:center;justify-content:center">
+        ${I.bat.replace('<svg','<svg width="20" height="20" fill="none" stroke="#0c1430" stroke-width="2.2"')}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;color:#8ea0cc;font-weight:700;letter-spacing:.8px;text-transform:uppercase">Home Battery</div>
+        <div style="font-size:15px;font-weight:700;color:var(--tp);margin-top:2px">
+          ${socPct!==null ? socPct+'%' : '—'}&thinsp;·&thinsp;<span style="color:#5eead4">${batKW!==null ? (batKW>0?'Charging':'Discharging') : 'Sigenergy pending'}</span>
+        </div>
+      </div>
+      ${batKW!==null ? `<div style="text-align:right;flex-shrink:0"><span style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;color:#5eead4">${batKW>0?'+':''}${batKW.toFixed(1)}</span><span style="font-size:10px;color:#8ea0cc"> kW</span></div>` : ''}
+    </div>
+    <div class="battery-bar-bg" style="height:7px"><div class="battery-bar-fill" style="width:${socPct??0}%"></div></div>
+  </div>`;
+
+  // Scenes
+  const scenesHTML = SCENE_BTNS.map(s=>{
+    const active = state.activeScene === s.id;
+    const cls = ['scene-btn', s.prominent?'good-night':'', active?'active':''].filter(Boolean).join(' ');
+    const ico = {moon:I.moon,sunrise:I.sun,fork:I.fork,music:I.music,film:I.film,lamp:I.lamp}[s.icon]||'';
+    return `<button class="${cls}" data-scene="${s.id}" data-scene-entity="${s.entity}">
+      <span style="display:inline-flex">${ico.replace('<svg','<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"')}</span>
+      ${s.label}
+    </button>`;
+  }).join('');
+
+  return `
+    <div class="home-header">
+      <div class="clock-block" id="clock-time">…</div>
+      <div class="header-cluster">
+        ${secMiniHTML} ${weatherHTML}
+      </div>
+    </div>
+    <div class="home-body">
+      <div class="climate-panel glass">
+        <div class="climate-header">
+          <div style="display:flex;align-items:center;gap:7px">
+            ${icon('therm',15,15,'color:var(--tm)')}
+            <span class="label-caps">Air Conditioning</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;color:var(--cyan);font-weight:600">${onCount} of 8 on</span>
+            <button id="zones-toggle" style="background:rgba(56,224,255,.12);border:1px solid rgba(56,224,255,.25);border-radius:20px;color:var(--cyan);font-size:11px;font-weight:600;padding:3px 10px">
+              ${state.zonesExpanded ? 'Show less' : 'All zones ›'}
+            </button>
+          </div>
+        </div>
+        <div class="climate-grid ${state.zonesExpanded?'expanded':'compact'}" id="zone-grid">
+          ${zoneGrid}
+        </div>
+      </div>
+      <div class="right-col">
+        <div class="cam-grid">
+          ${camTile('Garage', C.cameras.garage)}
+          ${camTile('Pool', C.cameras.pool)}
+          ${camTile('Julia St', C.cameras.julia)}
+          ${camTile('Chermside', C.cameras.chermside)}
+        </div>
+        ${garageHTML}
+        ${battHTML}
+      </div>
+    </div>
+    <div class="scene-bar">${scenesHTML}</div>`;
+}
+
+// ================================================================
+// ROOMS TAB
+// ================================================================
+function renderRooms() {
+  const cards = ROOMS.map(r => {
+    const firstLight = r.lights[0];
+    const on = firstLight ? ha.val(firstLight) === 'on' : false;
+    const temp = r.climate ? ha.attr(r.climate,'current_temperature') : null;
+    const hasLights = r.lights.length > 0;
+    return `<div class="room-card ${on?'on':''}" style="${on?`background:${r.color}14;border-color:${r.color}44;box-shadow:0 0 18px ${r.color}1a`:''}">
+      <div class="room-top">
+        <div class="room-icon-wrap" style="background:${r.color}22;border:1px solid ${r.color}44;color:${r.color}">
+          ${(I[r.icon]||I.sofa).replace('<svg','<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"')}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="room-name">${r.name}</div>
+          <div class="room-devices">${r.devices}</div>
+        </div>
+        ${temp!==null?`<div class="room-temp">${temp}°</div>`:''}
+      </div>
+      <div class="room-light-row">
+        <span class="room-light-label">${hasLights?(on?'Lights on':'Lights off'):'No lights wired'}</span>
+        ${hasLights?`<button class="pill-switch ${on?'on':'off'}" data-room="${r.id}" data-room-lights='${JSON.stringify(r.lights)}' data-room-on="${on}"></button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  return `
+    <div style="flex-shrink:0">
+      <div class="tab-title">Rooms</div>
+      <div class="tab-sub">Control lights and climate by room</div>
+    </div>
+    <div class="rooms-grid">${cards}</div>`;
+}
+
+// ================================================================
+// SECURITY TAB
+// ================================================================
+function renderSecurity() {
+  const chState = ha.val(C.garage_chermside);
+  const chOpen  = chState === 'open' || chState === 'opening';
+  const pirDefs = [
+    {label:'Kitchen',    entity:C.pir.kitchen},
+    {label:'Piano Nook', entity:C.pir.piano},
+    {label:'Hallway',    entity:C.pir.hallway},
+  ];
+  return `
+    <div style="flex-shrink:0">
+      <div class="tab-title">Security</div>
+      <div class="tab-sub">4 cameras · live</div>
+    </div>
+    <div class="security-body">
+      <div class="big-cam-grid">
+        ${camTile('Garage',    C.cameras.garage,     true)}
+        ${camTile('Pool',      C.cameras.pool,       true)}
+        ${camTile('Julia St',  C.cameras.julia,      true)}
+        ${camTile('Chermside', C.cameras.chermside,  true)}
+      </div>
+      <div class="sec-right">
+        <div class="sec-garage-row">
+          <div class="sec-garage-card glass" id="sec-ch" style="cursor:pointer">
+            <div style="display:flex;align-items:center;gap:8px">${icon('car',19,19,'color:var(--tm)')}<span class="sec-garage-name">Chermside</span></div>
+            <div class="sec-garage-status" style="color:${chOpen?'var(--red)':'var(--teal)'}">${chState}</div>
+            <div class="sec-garage-hint">Tap to ${chOpen?'close':'open'}</div>
+          </div>
+          <div class="sec-garage-card glass" style="opacity:.4;pointer-events:none">
+            <div style="display:flex;align-items:center;gap:8px">${icon('car',19,19,'color:var(--tm)')}<span class="sec-garage-name">Julia St</span></div>
+            <div class="sec-garage-status" style="color:var(--td)">Not installed</div>
+            <div class="sec-garage-hint">—</div>
+          </div>
+        </div>
+        <div class="motion-card glass">
+          <div class="label-caps" style="margin-bottom:3px">Motion Sensors</div>
+          ${pirDefs.map(p=>{
+            const active = ha.val(p.entity) === 'on';
+            return `<div class="motion-row">
+              <div class="motion-icon-wrap" style="background:${active?'rgba(255,174,61,.18)':'rgba(255,255,255,.07)'};border:1px solid ${active?'rgba(255,174,61,.45)':'rgba(255,255,255,.12)'};color:${active?'var(--amber)':'var(--td)'}">
+                ${I.motion.replace('<svg','<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"')}
+              </div>
+              <div>
+                <div class="motion-name">${p.label}</div>
+                <div class="motion-status ${active?'active':'clear'}">${active?'Motion detected now':'No motion · clear'}</div>
+              </div>
+              <div class="motion-status-dot ${active?'active':'clear'}"></div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="alarm-stub glass">
+          <div class="alarm-stub-title">${icon('shield',14,14,'color:var(--td);margin-right:6px')} Inception Alarm</div>
+          <div class="alarm-stub-body">Integration not yet configured in HA.<br>Alarm control will appear here once Inception is set up.</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ================================================================
+// ENERGY TAB
+// ================================================================
+function renderEnergy() {
+  const solar  = C.energy.solar_power  ? parseFloat(ha.val(C.energy.solar_power))  : null;
+  const soc    = C.energy.battery_soc  ? parseFloat(ha.val(C.energy.battery_soc))  : null;
+  const batKW  = C.energy.battery_power? parseFloat(ha.val(C.energy.battery_power)): null;
+  const grid   = C.energy.grid_power   ? parseFloat(ha.val(C.energy.grid_power))   : null;
+  const yToday = C.energy.yield_today  ? parseFloat(ha.val(C.energy.yield_today))  : null;
+  const home   = solar!==null ? Math.max(0,(solar??0)-(batKW??0)-(grid??0)) : null;
+  const pending = solar === null;
+
+  // SVG flow diagram
+  function node(x,y,label,val,unit,color) {
+    return `<g transform="translate(${x},${y})">
+      <rect x="-50" y="-33" width="100" height="68" rx="11" fill="rgba(255,255,255,.06)" stroke="${color}55" stroke-width="1"/>
+      <text x="0" y="-10" text-anchor="middle" fill="var(--tm)" font-size="9.5" font-weight="700" letter-spacing="1" font-family="Manrope,sans-serif">${label}</text>
+      <text x="0" y="16" text-anchor="middle" fill="${color}" font-size="20" font-weight="700" font-family="'Space Grotesk',sans-serif">${pending?'—':val}</text>
+      <text x="0" y="31" text-anchor="middle" fill="var(--td)" font-size="10" font-family="Manrope,sans-serif">${unit}</text>
+    </g>`;
+  }
+  function flowLine(x1,y1,x2,y2,active,color) {
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
+      stroke="${active?color:'rgba(255,255,255,.1)'}" stroke-width="2"
+      stroke-dasharray="8 4" stroke-linecap="round"
+      style="${active?'animation:flowDash 1.2s linear infinite':''}"/>`;
+  }
+
+  const solarVal  = solar!==null  ? solar.toFixed(1)  : '0.0';
+  const socVal    = soc!==null    ? Math.round(soc)+'%': '—';
+  const gridVal   = grid!==null   ? (grid>0?'+':'')+grid.toFixed(1) : '—';
+  const homeVal   = home!==null   ? home.toFixed(1)   : '—';
+
+  return `
+    <div style="flex-shrink:0">
+      <div class="tab-title">Energy</div>
+      <div class="tab-sub">Live power flow</div>
+    </div>
+    <div class="energy-body">
+      <div class="flow-panel glass">
+        ${pending?`<div class="flow-pending">
+          <div class="flow-pending-icon">${I.bolt.replace('<svg','<svg width="32" height="32" fill="none" stroke="var(--amber)" stroke-width="1.5"')}</div>
+          <div class="flow-pending-title">Sigenergy not yet connected</div>
+          <div class="flow-pending-body">Install the Sigenergy integration in HA and add the inverter IP to see live power flow.</div>
+        </div>`:''}
+        <svg width="100%" height="100%" viewBox="0 0 270 270" style="overflow:visible">
+          ${flowLine(135,65,135,195,!pending&&solar>0,'#2dd4bf')}
+          ${flowLine(75,148,125,203,!pending&&batKW<0,'#7c83ff')}
+          ${flowLine(195,148,145,203,!pending&&grid>0,'#ffae3d')}
+          ${node(135,47,'SOLAR',solarVal,'kW','#ffae3d')}
+          ${node(57,148,'BATTERY',socVal,'','#7c83ff')}
+          ${node(213,148,'GRID',gridVal,'kW','#9fb0d8')}
+          ${node(135,220,'HOME',homeVal,'kW','#38e0ff')}
+        </svg>
+      </div>
+      <div class="energy-right">
+        <div class="solar-card" style="${pending?'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)':'background:linear-gradient(135deg,rgba(45,212,191,.18),rgba(56,224,255,.08));border:1px solid rgba(56,224,255,.28)'}">
+          <div class="label-caps">Solar Generation</div>
+          <div class="solar-val" style="color:${pending?'var(--td)':'var(--teal)'}">${pending?'—':solarVal}</div>
+          <div class="solar-unit">kW live</div>
+        </div>
+        <div class="bat-energy-card glass">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span class="label-caps">Battery</span>
+            <span style="font-size:12px;font-weight:700;color:#7c83ff">${soc!==null?Math.round(soc)+'%':'—'}${batKW!==null?' · '+(batKW>0?'+':'')+batKW.toFixed(1)+' kW':''}</span>
+          </div>
+          <div class="battery-bar-bg"><div class="battery-bar-fill" style="background:linear-gradient(90deg,#7c83ff,#a78bfa);width:${soc??0}%"></div></div>
+        </div>
+        <div class="energy-small-row">
+          <div class="energy-small-card glass">
+            <div class="energy-small-label">Grid Export</div>
+            <div class="energy-small-val" style="color:${grid!==null&&grid<0?'var(--teal)':'var(--tm)'}">${grid!==null?Math.abs(grid).toFixed(1):'—'}</div>
+            <div class="energy-small-unit">kW</div>
+          </div>
+          <div class="energy-small-card glass">
+            <div class="energy-small-label">Yield Today</div>
+            <div class="energy-small-val" style="color:${yToday!==null?'var(--amber)':'var(--tm)'}">${yToday!==null?yToday.toFixed(1):'—'}</div>
+            <div class="energy-small-unit">kWh</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ================================================================
+// NAV
+// ================================================================
+const TABS = [
+  {id:'home',     label:'Home',     icon:'home'},
+  {id:'rooms',    label:'Rooms',    icon:'rooms'},
+  {id:'security', label:'Security', icon:'sec'},
+  {id:'energy',   label:'Energy',   icon:'bolt'},
+];
+function renderNav() {
+  return TABS.map(t=>`
+    <button class="nav-tab ${state.tab===t.id?'active':''}" data-tab="${t.id}">
+      ${I[t.icon].replace('<svg','<svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7"')}
+      <span>${t.label}</span>
+    </button>`).join('');
+}
+
+// ================================================================
+// MAIN RENDER
+// ================================================================
+function render() {
+  const app = document.getElementById('app');
+  const tabContent = {home:renderHome, rooms:renderRooms, security:renderSecurity, energy:renderEnergy}[state.tab]?.() ?? '';
+  app.innerHTML = `
+    <div id="content">${tabContent}</div>
+    <nav id="nav">${renderNav()}</nav>`;
+  if (state.tab === 'home') startClock();
+  bindEvents();
+}
+
+function rerender() {
+  // Lightweight re-render: only update dynamic bits where possible
+  // For simplicity, full re-render (fast enough at 1024×600)
+  render();
+}
+
+// ================================================================
+// EVENT BINDING
+// ================================================================
+function bindEvents() {
+  const app = document.getElementById('app');
+
+  // Nav tabs
+  app.querySelectorAll('[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => { state.tab = btn.dataset.tab; render(); });
+  });
+
+  // Zones toggle
+  const zt = document.getElementById('zones-toggle');
+  if (zt) zt.addEventListener('click', () => { state.zonesExpanded = !state.zonesExpanded; rerender(); });
+
+  // Zone power toggle
+  app.querySelectorAll('[data-zone-toggle]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = btn.dataset.zoneToggle;
+      ha.on(id) ? ha.hvacMode(id,'off') : ha.hvacMode(id,'fan_only');
+    });
+  });
+
+  // Zone temp buttons
+  app.querySelectorAll('[data-zone-temp]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = btn.dataset.zoneTemp;
+      const delta = parseInt(btn.dataset.delta);
+      const cur = ha.attr(id,'temperature') ?? 22;
+      ha.setTemp(id, Math.min(30, Math.max(16, cur + delta)));
+    });
+  });
+
+  // Garage
+  const chOpen = document.getElementById('ch-open');
+  const chClose = document.getElementById('ch-close');
+  if (chOpen) chOpen.addEventListener('click', () => ha.openCover(C.garage_chermside));
+  if (chClose) chClose.addEventListener('click', () => ha.closeCover(C.garage_chermside));
+
+  // Security tab garage
+  const secCh = document.getElementById('sec-ch');
+  if (secCh) secCh.addEventListener('click', () => {
+    const open = ha.val(C.garage_chermside) === 'open' || ha.val(C.garage_chermside) === 'opening';
+    open ? ha.closeCover(C.garage_chermside) : ha.openCover(C.garage_chermside);
+  });
+
+  // Alarm toggle
+  const alarmToggle = document.getElementById('alarm-toggle');
+  const alarmCard   = document.getElementById('alarm-card');
+  const toggleAlarm = () => {
+    if (!C.alarm) { state.alarmArmed = !state.alarmArmed; rerender(); return; }
+    state.alarmArmed
+      ? ha.callSvc('alarm_control_panel','alarm_disarm',{},{entity_id:C.alarm})
+      : ha.callSvc('alarm_control_panel','alarm_arm_away',{},{entity_id:C.alarm});
+  };
+  if (alarmToggle) alarmToggle.addEventListener('click', e => { e.stopPropagation(); toggleAlarm(); });
+  if (alarmCard) alarmCard.addEventListener('click', toggleAlarm);
+
+  // Scenes
+  app.querySelectorAll('[data-scene]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.scene;
+      const entity = btn.dataset.sceneEntity;
+      state.activeScene = state.activeScene === id ? null : id;
+      ha.scene(entity);
+      rerender();
+    });
+  });
+
+  // Room light switches
+  app.querySelectorAll('[data-room]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const lights = JSON.parse(btn.dataset.roomLights);
+      const on = btn.dataset.roomOn === 'true';
+      lights.forEach(l => on ? ha.turnOff(l) : ha.turnOn(l));
+    });
+  });
+}
+
+// ================================================================
+// AUTH + INIT
+// ================================================================
+function getToken() {
+  const hash   = new URLSearchParams(location.hash.replace('#',''));
+  const search = new URLSearchParams(location.search);
+  const fromUrl = hash.get('token') || search.get('token');
+  if (fromUrl) { sessionStorage.setItem('ha_token', fromUrl); return fromUrl; }
+  const cached = sessionStorage.getItem('ha_token');
+  if (cached) return cached;
+  const entered = prompt('Enter your Home Assistant long-lived access token:');
+  if (entered) sessionStorage.setItem('ha_token', entered);
+  return entered;
+}
+
+const token = getToken();
+if (!token) {
+  document.getElementById('app').innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--tm);font-size:14px">
+      <div>No token provided.</div>
+      <div style="font-size:12px">Reload with <code style="color:var(--cyan)">?token=YOUR_TOKEN</code> in the URL.</div>
+    </div>`;
+} else {
+  ha.connect(token);
+  ha.onReady(() => {
+    // Re-render on any entity change (throttled)
+    let rerenderScheduled = false;
+    ha.subAll(() => {
+      if (!rerenderScheduled) {
+        rerenderScheduled = true;
+        requestAnimationFrame(() => { rerenderScheduled = false; rerender(); });
+      }
+    });
+    render();
+  });
+}
+</script>
+</body>
+</html>
