@@ -1,0 +1,14 @@
+# Add this to your Home Assistant configuration.yaml (on the HA box), then restart HA.
+#
+#   shell_command:
+#     deploy_kiosk: 'curl -sL "https://raw.githubusercontent.com/jnebauer/home-assistant/main/ha-kiosk/kiosk.html" -o /config/www/kiosk/index.html'
+#
+# This file is documentation only — HA does not read it. The live copy lives in
+# configuration.yaml on the HA instance. deploy.sh triggers the service
+# `shell_command.deploy_kiosk` via the HA REST API after each git push.
+#
+# Note: inside the HA core container the config dir is /config (so /config/www/...),
+# which is the same folder the SSH add-on shows as /homeassistant/www/...
+
+shell_command:
+  deploy_kiosk: 'curl -sL "https://raw.githubusercontent.com/jnebauer/home-assistant/main/ha-kiosk/kiosk.html" -o /config/www/kiosk/index.html'
