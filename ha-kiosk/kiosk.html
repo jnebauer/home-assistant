@@ -351,8 +351,8 @@ const C = {
   weather:'weather.forecast_home',
   alarm:null, // Inception not yet integrated
   energy: {
-    solar_power:null, battery_soc:null, battery_power:null,
-    grid_power:null, yield_today:null // all null until Sigenergy connected
+    solar_power:'sensor.sigen_plant_pv_power', battery_soc:'sensor.sigen_plant_battery_state_of_charge', battery_power:'sensor.sigen_plant_battery_power',
+    grid_power:'sensor.sigen_plant_grid_active_power', yield_today:'sensor.sigen_plant_daily_pv_energy' // Sigenergy ESS (community integration) uses sigen_plant_* naming
   }
 };
 
@@ -536,6 +536,17 @@ function camTile(label, entity, big=false) {
   const textCls = big ? 'big-cam-live-text' : 'cam-live-text';
   const nameCls = big ? 'big-cam-name' : 'cam-name';
   const iconCls = big ? 'big-cam-icon' : 'cam-icon';
+  if (entity) {
+    const token = sessionStorage.getItem('ha_token') || '';
+    const streamUrl = `/api/camera_proxy_stream/${entity}?token=${encodeURIComponent(token)}`;
+    return `<div class="${cls}">
+      <img src="${streamUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="${iconCls}" style="display:none">${icon('cam',big?38:26,big?38:26)}</div>
+      <div class="${liveCls}"><div class="${dotCls}"></div><span class="${textCls}">LIVE</span></div>
+      <div class="${nameCls}">${label}</div>
+    </div>`;
+  }
   return `<div class="${cls}">
     <div class="${iconCls}">${icon('cam',big?38:26,big?38:26)}</div>
     <div class="${liveCls}"><div class="${dotCls}"></div><span class="${textCls}">LIVE</span></div>
