@@ -1,0 +1,32 @@
+HA Kiosk URL — paste this into Fully Kiosk Browser "Start URL" on each S567
+=============================================================================
+
+https://trmrkruz5ssdwqauhjq2hnzyziqy4sxl.ui.nabu.casa/local/kiosk/index.html?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxYzg0ZTAzNmYwZmI0ZjFiYWViMmQ3MzZhZTk4NTA1OCIsImlhdCI6MTc4MjEzMTk3NCwiZXhwIjoyMDk3NDkxOTc0fQ.DdLwz1p9yxSMPklJreTDXjsTEKxK4rqePlPmGI-cbc4
+
+=============================================================================
+FKB SETUP CHECKLIST (do this once on each panel touchscreen)
+=============================================================================
+
+1. Tap the Fully Kiosk Browser icon on the S567 home screen
+2. Paste the URL above into "Start URL"
+3. Go to FKB Settings → Remote Administration:
+     - Enable Remote Administration: ON
+     - Remote Admin Password: (set something you'll remember)
+     - Remote Admin Port: 2323
+4. Tap "Save & Start"
+
+Once Remote Admin is enabled, the panels can be configured remotely from:
+     http://192.168.3.200:2323   (panel 1)
+     http://192.168.3.201:2323   (panel 2)
+
+=============================================================================
+DEVICES
+=============================================================================
+
+S567 Panel 1:   192.168.3.200  (MAC: 0C11052F6BEE)
+S567 Panel 2:   192.168.3.201  (MAC: 0C11052F6CDE)
+R25A Intercom:  192.168.3.202
+R25A Intercom:  192.168.3.203
+
+Akuvox web admin:  https://192.168.3.200  /  https://192.168.3.201
+HA token name:     Kiosk S567 (expires Dec 2036)

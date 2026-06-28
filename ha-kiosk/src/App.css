@@ -1,0 +1,233 @@
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  /* Background aurora */
+  --bg-gradient: linear-gradient(158deg, #0f1c40 0%, #0a1330 55%, #0b1733 100%);
+  --bg-base: #0a1330;
+
+  /* Text */
+  --text-primary:  #f3f6ff;
+  --text-muted:    #9fb0d8;
+  --text-dim:      #8ea0cc;
+  --text-soft:     #cdd6ee;
+
+  /* Glass surfaces */
+  --glass-bg:      rgba(255,255,255,0.06);
+  --glass-border:  rgba(255,255,255,0.11);
+  --glass-blur:    blur(22px);
+  --glass-inner:   inset 0 1px 0 rgba(255,255,255,0.08);
+
+  /* Accents */
+  --cyan:    #38e0ff;
+  --teal:    #2dd4bf;
+  --teal-lt: #5eead4;
+  --amber:   #ffae3d;
+  --amber-lt:#ffc878;
+  --red:     #ff5d6c;
+  --red-lt:  #ff9aa5;
+  --indigo:  #7c83ff;
+  --indigo-dk:#5b62d6;
+  --sky:     #7fc4ff;
+
+  /* Radius */
+  --r-card: 18px;
+  --r-sm:   10px;
+  --r-pill: 99px;
+
+  /* Nav */
+  --nav-h: 52px;
+  --nav-bg: rgba(8,14,32,0.82);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.app {
+  width: 1024px;
+  height: 600px;
+  position: relative;
+  background: var(--bg-gradient);
+  overflow: hidden;
+  font-family: 'Manrope', sans-serif;
+  color: var(--text-primary);
+}
+
+/* Aurora radial glows */
+.app::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 560px 320px at 20% 10%, rgba(56,118,222,0.35) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 280px at 80% 80%, rgba(34,176,140,0.28) 0%, transparent 70%),
+    radial-gradient(ellipse 300px 200px at 65% 5%, rgba(96,66,200,0.30) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.content {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  bottom: var(--nav-h);
+  padding: 14px 16px 10px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   BOTTOM NAV
+   ============================================================ */
+.bottom-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: var(--nav-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(255,255,255,0.09);
+  display: flex;
+  align-items: stretch;
+  z-index: 10;
+}
+
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: 'Manrope', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.nav-tab svg {
+  width: 20px; height: 20px;
+  stroke-width: 1.7;
+}
+
+.nav-tab.active {
+  color: var(--cyan);
+}
+
+.nav-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 20%; right: 20%;
+  height: 3px;
+  background: var(--cyan);
+  border-radius: 0 0 3px 3px;
+}
+
+/* ============================================================
+   GLASS CARD
+   ============================================================ */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-inner);
+}
+
+/* ============================================================
+   LOADING SCREEN
+   ============================================================ */
+.loading {
+  width: 1024px; height: 600px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-gradient);
+  color: var(--text-muted);
+  font-size: 15px;
+  font-family: 'Manrope', sans-serif;
+  gap: 12px;
+}
+
+.loading-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ============================================================
+   SHARED UTILITIES
+   ============================================================ */
+.label-caps {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pill-switch {
+  width: 44px; height: 25px;
+  border-radius: var(--r-pill);
+  position: relative;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.pill-switch.on  { background: var(--teal); }
+.pill-switch.off { background: rgba(255,255,255,0.15); }
+.pill-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  width: 19px; height: 19px;
+  border-radius: 50%;
+  background: white;
+  transition: left 0.2s;
+}
+.pill-switch.on::after  { left: 22px; }
+.pill-switch.off::after { left: 3px; }
+
+.icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background 0.15s, border-color 0.15s;
+}
+.icon-btn:active { background: rgba(255,255,255,0.18); }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes flowDash {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(255,174,61,0.5); }
+  50% { box-shadow: 0 0 20px rgba(255,174,61,0.9); }
+}

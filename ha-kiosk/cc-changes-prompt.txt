@@ -1,0 +1,186 @@
+Make 4 changes to ~/Home\ Assistant/ha-kiosk/kiosk.html. Edit the file in place. Be surgical — change only what is specified. Do not reformat or restructure any other code.
+
+===========================================================================
+CHANGE 1 — AC zone cards: show 6 specific zones in 3-column compact grid
+===========================================================================
+
+1a. Replace the ZONES array (around line 332) with this:
+
+const ZONES = [
+  {id:'master', name:'Master',  entity:'climate.master',  common:true},
+  {id:'kitchen',name:'Kitchen', entity:'climate.kitchen', common:true},
+  {id:'dining', name:'Dining',  entity:'climate.dining',  common:true},
+  {id:'tv_room',name:'TV Room', entity:'climate.tv_room', common:false},
+  {id:'char',   name:'Char',    entity:'climate.char',    common:true},
+  {id:'ella',   name:'Ella',    entity:'climate.ella',    common:true},
+  {id:'josh',   name:'Josh',    entity:'climate.josh',    common:true},
+  {id:'study',  name:'Study',   entity:'climate.study',   common:false},
+];
+
+1b. In the CSS, change the compact climate grid from 2 to 3 columns:
+  FIND:    .climate-grid.compact{grid-template-columns:repeat(2,1fr)}
+  REPLACE: .climate-grid.compact{grid-template-columns:repeat(3,1fr)}
+
+1c. Reduce zone-tile padding in CSS:
+  FIND:    .zone-tile{border-radius:12px;padding:8px 9px;
+  REPLACE: .zone-tile{border-radius:12px;padding:6px 8px;
+
+1d. Reduce zone-name font size in CSS:
+  FIND:    .zone-name{font-size:13px;font-weight:700}
+  REPLACE: .zone-name{font-size:11px;font-weight:700}
+
+1e. Reduce zone-set-temp font in CSS:
+  FIND:    .zone-set-temp{font-family:'Space Grotesk',sans-serif;font-size:25px;font-weight:600;color:var(--tp);line-height:1}
+  REPLACE: .zone-set-temp{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:600;color:var(--tp);line-height:1}
+
+1f. Reduce zone-btn size in CSS:
+  FIND:    .zone-btn{width:36px;height:36px;border-radius:11px;border:1px solid rgba(255,255,255,.15);
+             background:rgba(255,255,255,.1);color:var(--tp);font-size:22px;font-weight:300;
+  REPLACE: .zone-btn{width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.15);
+             background:rgba(255,255,255,.1);color:var(--tp);font-size:18px;font-weight:300;
+
+1g. Reduce zone-pwr button size in CSS:
+  FIND:    .zone-pwr{width:30px;height:30px;border-radius:9px;
+  REPLACE: .zone-pwr{width:26px;height:26px;border-radius:7px;
+
+1h. Update onCount to count only common zones and fix the "of N" label in renderHome():
+  FIND:    const onCount = ZONES.filter(z=>ha.on(z.entity)).length;
+  REPLACE: const onCount = ZONES.filter(z=>z.common && ha.on(z.entity)).length;
+
+  FIND:    <span style="font-size:12px;color:var(--cyan);font-weight:600">${onCount} of 8 on</span>
+  REPLACE: <span style="font-size:12px;color:var(--cyan);font-weight:600">${onCount} of 6 on</span>
+
+
+===========================================================================
+CHANGE 2 — Weather card: larger with dynamic sun/cloud icon
+===========================================================================
+
+2a. Update weather-card CSS (around line 111):
+  FIND:
+    .weather-card{padding:12px 18px;border-radius:16px;display:flex;flex-direction:column;gap:6px;justify-content:center;min-width:155px}
+    .weather-temp{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:600;color:var(--tp)}
+    .weather-cond{font-size:12px;color:var(--tm);line-height:1.4}
+  REPLACE:
+    .weather-card{padding:14px 16px;border-radius:16px;display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:180px}
+    .weather-temp{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:600;color:var(--tp);line-height:1}
+    .weather-cond{font-size:11px;color:var(--tm);line-height:1.4}
+
+2b. Add a weatherIcon() helper function just before renderHome() (around line 522):
+  Add this function:
+
+function weatherIcon(condState) {
+  const s = (condState||'').toLowerCase();
+  const isSunny = s==='sunny'||s==='clear'||s==='clear_night';
+  const isRainy = s.includes('rain')||s.includes('pour')||s.includes('thunder')||s.includes('lightning');
+  const isNight = new Date().getHours()>=20||new Date().getHours()<6;
+  if (isSunny && !isNight) {
+    return `<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="22" cy="22" r="10" fill="#ffae3d"/>
+      <line x1="22" y1="4" x2="22" y2="8" stroke="#ffae3d" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="22" y1="36" x2="22" y2="40" stroke="#ffae3d" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="4" y1="22" x2="8" y2="22" stroke="#ffae3d" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="36" y1="22" x2="40" y2="22" stroke="#ffae3d" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="8.9" y1="8.9" x2="11.8" y2="11.8" stroke="#ffae3d" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="32.2" y1="32.2" x2="35.1" y2="35.1" stroke="#ffae3d" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="35.1" y1="8.9" x2="32.2" y2="11.8" stroke="#ffae3d" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="11.8" y1="32.2" x2="8.9" y2="35.1" stroke="#ffae3d" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>`;
+  }
+  const cloudCol = isRainy ? '#6fb3e8' : '#7fc4ff';
+  return `<svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="16" r="8" fill="#ffae3d" opacity="${isNight?'0':'0.95'}"/>
+    ${!isNight?`
+    <line x1="16" y1="4" x2="16" y2="7" stroke="#ffae3d" stroke-width="2" stroke-linecap="round"/>
+    <line x1="4" y1="16" x2="7" y2="16" stroke="#ffae3d" stroke-width="2" stroke-linecap="round"/>
+    <line x1="7.5" y1="7.5" x2="9.6" y2="9.6" stroke="#ffae3d" stroke-width="2" stroke-linecap="round"/>
+    <line x1="25" y1="7.5" x2="22.9" y2="9.6" stroke="#ffae3d" stroke-width="2" stroke-linecap="round"/>
+    `:`<path d="M10 16a6 6 0 0 1 9.74-4.68A8 8 0 0 0 18 16" fill="#c8d5f0" opacity="0.7"/>`}
+    <ellipse cx="33" cy="24" rx="11" ry="8" fill="${cloudCol}"/>
+    <ellipse cx="41" cy="26" rx="8" ry="7" fill="${cloudCol}"/>
+    <ellipse cx="37" cy="20" rx="7" ry="5.5" fill="#9fb0d8"/>
+    <rect x="23" y="23" width="24" height="10" rx="5" fill="${cloudCol}"/>
+    ${isRainy?`
+    <line x1="28" y1="34" x2="26" y2="39" stroke="#7fc4ff" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    <line x1="34" y1="34" x2="32" y2="39" stroke="#7fc4ff" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    <line x1="40" y1="34" x2="38" y2="39" stroke="#7fc4ff" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    `:''}
+  </svg>`;
+}
+
+2c. Replace the weatherHTML block in renderHome() (around line 551):
+  FIND:
+    const weatherHTML = `
+      <div class="weather-card glass">
+        ${icon('cloud',28,28,'color:var(--sky)')}
+        <div class="weather-temp">${wTemp}°</div>
+        <div class="weather-cond">${wCond}<br>Highgate Hill</div>
+      </div>`;
+  REPLACE:
+    const weatherHTML = `
+      <div class="weather-card glass">
+        ${weatherIcon(wSt?.state)}
+        <div class="weather-temp">${wTemp}°</div>
+        <div class="weather-cond">${wCond}<br>Highgate Hill</div>
+      </div>`;
+
+
+===========================================================================
+CHANGE 3 — Remove CCTV cameras from Home tab (they stay on Security page)
+===========================================================================
+
+3a. In renderHome(), remove the cam-grid div entirely from the right-col.
+  FIND (these 7 lines, inside the right-col div):
+          <div class="cam-grid">
+            ${camTile('Garage', C.cameras.garage)}
+            ${camTile('Pool', C.cameras.pool)}
+            ${camTile('Julia St', C.cameras.julia)}
+            ${camTile('Chermside', C.cameras.chermside)}
+          </div>
+
+  DELETE those 7 lines. The right-col should then contain only ${garageHTML} and ${battHTML}.
+
+Note: The cameras remain unchanged on the Security tab. Do NOT touch renderSecurity().
+
+
+===========================================================================
+CHANGE 4 — Sigenergy/Battery card: make it larger and more prominent
+===========================================================================
+
+4a. Update battery-card CSS:
+  FIND:    .battery-card{padding:12px 14px;border-radius:14px;display:flex;flex-direction:column;gap:8px;flex:1;min-height:90px}
+  REPLACE: .battery-card{padding:18px 16px;border-radius:16px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+
+4b. In battHTML (renderHome()), enlarge the icon wrap:
+  FIND:    style="width:36px;height:36px;flex-shrink:0;border-radius:11px;background:#2dd4bf;display:flex;align-items:center;justify-content:center"
+  REPLACE: style="width:48px;height:48px;flex-shrink:0;border-radius:14px;background:#2dd4bf;display:flex;align-items:center;justify-content:center"
+
+4c. Enlarge the battery icon inside:
+  FIND:    ${I.bat.replace('<svg','<svg width="20" height="20" fill="none" stroke="#0c1430" stroke-width="2.2"')}
+  REPLACE: ${I.bat.replace('<svg','<svg width="26" height="26" fill="none" stroke="#0c1430" stroke-width="2"')}
+
+4d. Update the label text and font sizes:
+  FIND:    <div style="font-size:10px;color:#8ea0cc;font-weight:700;letter-spacing:.8px;text-transform:uppercase">Home Battery</div>
+  REPLACE: <div style="font-size:10px;color:#8ea0cc;font-weight:700;letter-spacing:.8px;text-transform:uppercase">Sigenergy Battery</div>
+
+  FIND:    <div style="font-size:15px;font-weight:700;color:var(--tp);margin-top:2px">
+  REPLACE: <div style="font-size:19px;font-weight:700;color:var(--tp);margin-top:4px">
+
+4e. Enlarge the kW value:
+  FIND:    <span style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;color:#5eead4">
+  REPLACE: <span style="font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:600;color:#5eead4">
+
+4f. Make the battery bar taller:
+  FIND:    <div class="battery-bar-bg" style="height:7px">
+  REPLACE: <div class="battery-bar-bg" style="height:10px">
+
+
+===========================================================================
+VERIFY
+===========================================================================
+After all edits:
+1. Run: grep -n "repeat(3,1fr)" ~/Home\ Assistant/ha-kiosk/kiosk.html   → should find a match
+2. Run: grep -n "weatherIcon" ~/Home\ Assistant/ha-kiosk/kiosk.html     → should find 2 matches (definition + call)
+3. Run: grep -n "cam-grid" ~/Home\ Assistant/ha-kiosk/kiosk.html         → should find CSS only, NOT inside renderHome()
+4. Run: grep -n "Sigenergy Battery" ~/Home\ Assistant/ha-kiosk/kiosk.html → should find 1 match
+5. Run: wc -c ~/Home\ Assistant/ha-kiosk/kiosk.html                      → report byte count
+6. Report pass/fail for each check.
