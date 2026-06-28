@@ -13,7 +13,7 @@ git commit -m "update: $(date +%Y-%m-%d\ %H:%M)" || echo "(nothing to commit)"
 git push origin main
 
 echo "Waiting for GitHub CDN to propagate..."
-sleep 5
+sleep 20
 
 if [ ! -f "$TOKEN_FILE" ]; then
   echo ""

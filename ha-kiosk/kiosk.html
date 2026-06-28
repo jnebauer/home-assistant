@@ -107,10 +107,25 @@ button:disabled{cursor:not-allowed}
 .alarm-status.armed{color:var(--teal)}
 .alarm-status.disarmed{color:var(--td)}
 
-/* Weather card */
-.weather-card{padding:14px 16px;border-radius:16px;display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:180px}
-.weather-temp{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:600;color:var(--tp);line-height:1}
-.weather-cond{font-size:11px;color:var(--tm);line-height:1.4}
+/* Weather card (wide, single row) */
+.weather-card{padding:14px 20px;border-radius:16px;display:flex;align-items:center;gap:16px;flex:1;min-width:0}
+.wx-current{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.wx-ico svg{height:38px;width:auto}
+.wx-current-text{display:flex;flex-direction:column;gap:1px}
+.weather-temp{font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:700;color:#f3f6ff;line-height:1}
+.weather-cond{font-size:11px;color:#9fb0d8;line-height:1.35}
+.wx-divider{width:1px;height:46px;background:rgba(255,255,255,.1);flex-shrink:0}
+.wx-forecast{display:flex;gap:8px;flex:1;min-width:0}
+.wx-day{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:10px 12px;border-radius:11px;flex:1;min-width:0}
+.wx-day.today{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
+.wx-day.other{background:rgba(255,255,255,.04);border:1px solid transparent}
+.wx-day-name{font-size:12px;font-weight:700;color:#f3f6ff;flex-shrink:0}
+.wx-ico-sm svg{height:22px;width:auto}
+.wx-day-temps{font-size:13px;font-weight:600;flex-shrink:0}
+.wx-sun{display:flex;flex-direction:column;gap:7px;flex-shrink:0}
+.wx-sun-row{display:flex;align-items:center;gap:6px}
+.wx-sun-label{font-size:10px;color:#9fb0d8}
+.wx-sun-time{font-size:13px;font-weight:700;margin-left:2px}
 
 /* Body row */
 .home-body{display:flex;gap:10px;flex:1;min-height:0;margin-top:9px}
@@ -121,26 +136,30 @@ button:disabled{cursor:not-allowed}
 .climate-grid{display:grid;gap:7px;flex:1;min-height:0;overflow-y:auto}
 .climate-grid.compact{grid-template-columns:repeat(3,1fr)}
 .climate-grid.expanded{grid-template-columns:repeat(4,1fr)}
-.zone-tile{border-radius:12px;padding:6px 8px;display:flex;flex-direction:column;gap:5px;transition:all .2s}
-.zone-tile.on{background:rgba(56,224,255,.08);border:1px solid rgba(56,224,255,.25);box-shadow:0 0 12px rgba(56,224,255,.1)}
-.zone-tile.off{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)}
+.zone-tile{border-radius:16px;padding:11px 13px;display:flex;flex-direction:column;gap:9px;transition:all .2s}
+.zone-tile.on{background:rgba(56,224,255,.08);border:1.5px solid rgba(56,224,255,.28)}
+.zone-tile.off{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
 .zone-header{display:flex;align-items:center;justify-content:space-between}
-.zone-name{font-size:11px;font-weight:700}
-.zone-name.on{color:var(--tp)}
-.zone-name.off{color:var(--tm)}
-.zone-pwr{width:26px;height:26px;border-radius:7px;border:none;display:flex;align-items:center;justify-content:center;transition:background .2s}
-.zone-pwr.on{background:var(--teal);box-shadow:0 0 10px rgba(45,212,191,.5)}
-.zone-pwr.off{background:rgba(255,255,255,.1)}
-.zone-controls{display:flex;align-items:center;gap:5px}
-.zone-btn{width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.15);
-  background:rgba(255,255,255,.1);color:var(--tp);font-size:18px;font-weight:300;
+.zone-name{font-size:17px;font-weight:700}
+.zone-name.on{color:#f3f6ff}
+.zone-name.off{color:#7080a0}
+.zone-pwr{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;transition:all .2s}
+.zone-pwr.on{background:#2dd4bf;border:none;box-shadow:0 0 18px rgba(45,212,191,.55)}
+.zone-pwr.off{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.13)}
+.zone-controls{display:flex;align-items:center;gap:8px}
+.zone-btn{flex:1;height:52px;border-radius:13px;border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.1);color:#f3f6ff;font-size:30px;font-weight:200;
   display:flex;align-items:center;justify-content:center;line-height:1}
-.zone-set{flex:1;text-align:center}
-.zone-set-temp{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:600;color:var(--tp);line-height:1}
-.zone-cur{font-size:10px;color:var(--cyan);margin-top:2px}
-.zone-off-row{display:flex;align-items:center;justify-content:space-between}
-.zone-off-label{font-size:11px;color:var(--td)}
-.zone-cur-off{font-size:11px;color:var(--tm)}
+.zone-btn.dim{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.2)}
+.zone-set{flex:1.3;text-align:center}
+.zone-set-temp{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:700;color:#f3f6ff;line-height:1}
+.zone-set-temp.off{color:rgba(255,255,255,.22);font-weight:500}
+.zone-set-label{font-size:11px;color:#9fb0d8;margin-top:2px}
+.zone-strip{background:rgba(0,0,0,.25);border-radius:9px;padding:6px;text-align:center;font-size:13px}
+.zone-strip-label{color:#9fb0d8}
+.zone-strip-val{color:#38e0ff;font-weight:700}
+.zone-strip.off .zone-strip-label{color:#5a6a82}
+.zone-strip.off .zone-strip-val{color:#6b7d9e}
 
 /* Right column */
 .right-col{flex:1.2;display:flex;flex-direction:column;gap:8px;min-height:0}
@@ -180,16 +199,24 @@ button:disabled{cursor:not-allowed}
 .battery-bar-bg{height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}
 .battery-bar-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal2));border-radius:4px;transition:width .5s ease}
 
+/* Alarm card (right column) */
+.ha-alarm-card{border-radius:16px;padding:12px 16px;display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.ha-alarm-top{display:flex;align-items:center;gap:11px}
+.ha-alarm-icon{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
+.ha-alarm-sub{font-size:12px;color:#8ea0cc;margin-top:2px}
+.ha-alarm-badge{font-size:11px;font-weight:700;color:#8ea0cc;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:99px;padding:4px 12px;flex-shrink:0}
+.ha-alarm-divider{height:1px;background:rgba(255,255,255,.09)}
+.ha-alarm-pirs{display:flex;align-items:center;gap:16px}
+.ha-pir{display:flex;align-items:center;gap:7px}
+.ha-pir-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ha-pir-name{font-size:12px;color:#cdd6ee}
+
 /* Scene bar */
 .scene-bar{display:flex;gap:7px;height:66px;flex-shrink:0;margin-top:9px}
 .scene-btn{flex:1;border-radius:13px;border:1px solid rgba(255,255,255,.11);
   background:rgba(255,255,255,.06);color:var(--tm);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:4px;transition:all .2s;font-size:10px;font-weight:700;letter-spacing:.5px}
-.scene-btn.good-night{background:linear-gradient(135deg,var(--indigo),var(--indigoDk));
-  border-color:rgba(124,131,255,.3);color:var(--tp);box-shadow:0 4px 16px rgba(92,98,214,.4)}
-.scene-btn.active:not(.good-night){background:rgba(56,224,255,.15);border-color:rgba(56,224,255,.4);color:var(--cyan)}
-.scene-btn.active.good-night{background:linear-gradient(135deg,#9b6fff,#6b52d6)}
 .scene-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
 
 /* ============ ROOMS TAB ============ */
@@ -559,39 +586,47 @@ function weatherIcon(condState) {
 }
 
 function renderHome() {
-  // Combined security mini card (alarm + motion)
-  const alarmCol = state.alarmArmed ? 'var(--teal)' : 'var(--td)';
-  const secMiniHTML = `
-    <div class="security-mini glass" id="alarm-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-        <div style="display:flex;align-items:center;gap:7px">
-          ${I.shield.replace('<svg','<svg width="16" height="16" fill="none" stroke="'+alarmCol+'" stroke-width="1.8"')}
-          <div style="line-height:1.15">
-            <div class="label-caps">Alarm</div>
-            <div class="alarm-status ${state.alarmArmed?'armed':'disarmed'}">
-              ${C.alarm ? (state.alarmArmed ? 'Armed' : 'Disarmed') : 'Not set up'}
-            </div>
-          </div>
-        </div>
-        <button class="pill-switch ${state.alarmArmed?'on':'off'}" id="alarm-toggle"></button>
-      </div>
-      <div class="sec-mini-divider"></div>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        ${liveChip('Kitchen', C.pir.kitchen)}
-        ${liveChip('Piano Nook', C.pir.piano)}
-        ${liveChip('Hallway', C.pir.hallway)}
-      </div>
-    </div>`;
-
   // Weather
   const wSt = ha.st(C.weather);
   const wTemp = wSt?.attributes?.temperature ?? '--';
   const wCond = (wSt?.state ?? 'unknown').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  const fc3 = (wSt?.attributes?.forecast || []).slice(0,3);
+  const dayShort = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const fcTiles = [0,1,2].map(i=>{
+    const f = fc3[i];
+    const today = i===0;
+    const name = today ? 'Today' : (f ? dayShort[new Date(f.datetime).getDay()] : '—');
+    const hi = f?.temperature ?? '--';
+    const lo = f?.templow ?? '--';
+    const cond = f?.condition ?? wSt?.state;
+    return `<div class="wx-day ${today?'today':'other'}">
+      <span class="wx-day-name">${name}</span>
+      <span class="wx-ico-sm">${weatherIcon(cond)}</span>
+      <span class="wx-day-temps"><span style="color:#f3f6ff">${hi}°</span> <span style="color:#8ea0cc">${lo}°</span></span>
+    </div>`;
+  }).join('');
+  const sunSt = ha.st('sun.sun');
+  const fmtSun = iso => { if (!iso) return '--'; try { return new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}); } catch(e) { return '--'; } };
+  const sunrise = fmtSun(sunSt?.attributes?.next_rising);
+  const sunset  = fmtSun(sunSt?.attributes?.next_setting);
+  const sunriseIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffae3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="3"/><polyline points="8 6 12 2 16 6"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="1" y1="22" x2="23" y2="22"/></svg>`;
+  const sunsetIcon  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff9aa5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="8"/><polyline points="16 5 12 9 8 5"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="1" y1="22" x2="23" y2="22"/></svg>`;
   const weatherHTML = `
     <div class="weather-card glass">
-      ${weatherIcon(wSt?.state)}
-      <div class="weather-temp">${wTemp}°</div>
-      <div class="weather-cond">${wCond}<br>Highgate Hill</div>
+      <div class="wx-current">
+        <span class="wx-ico">${weatherIcon(wSt?.state)}</span>
+        <div class="wx-current-text">
+          <div class="weather-temp">${wTemp}°</div>
+          <div class="weather-cond">${wCond}<br>Highgate Hill</div>
+        </div>
+      </div>
+      <div class="wx-divider"></div>
+      <div class="wx-forecast">${fcTiles}</div>
+      <div class="wx-divider"></div>
+      <div class="wx-sun">
+        <div class="wx-sun-row">${sunriseIcon}<span class="wx-sun-label">Sunrise</span><span class="wx-sun-time" style="color:#ffae3d">${sunrise}</span></div>
+        <div class="wx-sun-row">${sunsetIcon}<span class="wx-sun-label">Sunset</span><span class="wx-sun-time" style="color:#ff9aa5">${sunset}</span></div>
+      </div>
     </div>`;
 
   // Climate zones
@@ -601,24 +636,43 @@ function renderHome() {
     const on = ha.on(z.entity);
     const setT = ha.attr(z.entity,'temperature') ?? 22;
     const curT = ha.attr(z.entity,'current_temperature') ?? '--';
-    return `<div class="zone-tile ${on?'on':'off'}" data-zone="${z.entity}">
+    const pwrCol = on ? '#062018' : 'rgba(255,255,255,.28)';
+    const pwrIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${pwrCol}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>`;
+    if (on) {
+      return `<div class="zone-tile on" data-zone="${z.entity}">
+        <div class="zone-header">
+          <span class="zone-name on">${z.name}</span>
+          <button class="zone-pwr on" data-zone-toggle="${z.entity}" title="Turn off">${pwrIcon}</button>
+        </div>
+        <div class="zone-controls">
+          <button class="zone-btn" data-zone-temp="${z.entity}" data-delta="-1">−</button>
+          <div class="zone-set">
+            <div class="zone-set-temp">${setT}°</div>
+            <div class="zone-set-label">set temp</div>
+          </div>
+          <button class="zone-btn" data-zone-temp="${z.entity}" data-delta="1">+</button>
+        </div>
+        <div class="zone-strip">
+          <span class="zone-strip-label">Currently </span><span class="zone-strip-val">${curT}°</span>
+        </div>
+      </div>`;
+    }
+    return `<div class="zone-tile off" data-zone="${z.entity}">
       <div class="zone-header">
-        <span class="zone-name ${on?'on':'off'}">${z.name}</span>
-        <button class="zone-pwr ${on?'on':'off'}" data-zone-toggle="${z.entity}" title="${on?'Turn off':'Turn on'}">
-          ${I.power.replace('<svg','<svg width="12" height="12" fill="none" stroke="'+(on?'#0a1330':'#cdd6ee')+'" stroke-width="2.5"')}
-        </button>
+        <span class="zone-name off">${z.name}</span>
+        <button class="zone-pwr off" data-zone-toggle="${z.entity}" title="Turn on">${pwrIcon}</button>
       </div>
-      ${on
-        ? `<div class="zone-controls">
-            <button class="zone-btn" data-zone-temp="${z.entity}" data-delta="-1">−</button>
-            <div class="zone-set">
-              <div class="zone-set-temp">${setT}°</div>
-              <div class="zone-cur">Now ${curT}°</div>
-            </div>
-            <button class="zone-btn" data-zone-temp="${z.entity}" data-delta="1">+</button>
-          </div>`
-        : `<div class="zone-off-row"><span class="zone-off-label">Off</span><span class="zone-cur-off">Now ${curT}°</span></div>`
-      }
+      <div class="zone-controls">
+        <div class="zone-btn dim">−</div>
+        <div class="zone-set">
+          <div class="zone-set-temp off">${setT}°</div>
+          <div class="zone-set-label">set temp</div>
+        </div>
+        <div class="zone-btn dim">+</div>
+      </div>
+      <div class="zone-strip off">
+        <span class="zone-strip-label">Currently </span><span class="zone-strip-val">${curT}°</span>
+      </div>
     </div>`;
   }).join('');
 
@@ -674,12 +728,36 @@ function renderHome() {
     <div class="battery-bar-bg" style="height:10px"><div class="battery-bar-fill" style="width:${socPct??0}%"></div></div>
   </div>`;
 
+  // Alarm (Inception — offline placeholder for now)
+  const alarmArmed = C.alarm ? state.alarmArmed : false;
+  const alarmBell = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
+  const alarmPirs = [
+    {name:'Kitchen',    entity:C.pir.kitchen},
+    {name:'Piano Nook', entity:C.pir.piano},
+    {name:'Hallway',    entity:C.pir.hallway},
+  ];
+  const alarmCardHTML = `<div class="ha-alarm-card glass">
+    <div class="ha-alarm-top">
+      <div class="ha-alarm-icon">${alarmBell}</div>
+      <div style="flex:1;min-width:0">
+        <div class="label-caps">Alarm</div>
+        <div class="ha-alarm-sub">Inception · offline</div>
+      </div>
+      <div class="ha-alarm-badge" style="${alarmArmed?'color:var(--red2);background:rgba(255,93,108,.14);border-color:rgba(255,93,108,.3)':''}">${alarmArmed?'Armed':'Disarmed'}</div>
+    </div>
+    <div class="ha-alarm-divider"></div>
+    <div class="ha-alarm-pirs">
+      ${alarmPirs.map(p=>{
+        const motion = C.alarm ? ha.val(p.entity) === 'on' : false;
+        return `<div class="ha-pir"><span class="ha-pir-dot" style="background:${motion?'#ffae3d':'#2dd4bf'}"></span><span class="ha-pir-name">${p.name}</span></div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
   // Scenes
   const scenesHTML = SCENE_BTNS.map(s=>{
-    const active = state.activeScene === s.id;
-    const cls = ['scene-btn', s.prominent?'good-night':'', active?'active':''].filter(Boolean).join(' ');
     const ico = {moon:I.moon,sunrise:I.sun,fork:I.fork,music:I.music,film:I.film,lamp:I.lamp}[s.icon]||'';
-    return `<button class="${cls}" data-scene="${s.id}" data-scene-entity="${s.entity}">
+    return `<button class="scene-btn" data-scene="${s.id}" data-scene-entity="${s.entity}">
       <span style="display:inline-flex">${ico.replace('<svg','<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"')}</span>
       ${s.label}
     </button>`;
@@ -688,9 +766,7 @@ function renderHome() {
   return `
     <div class="home-header">
       <div class="clock-block" id="clock-time">…</div>
-      <div class="header-cluster">
-        ${secMiniHTML} ${weatherHTML}
-      </div>
+      ${weatherHTML}
     </div>
     <div class="home-body">
       <div class="climate-panel glass">
@@ -713,6 +789,7 @@ function renderHome() {
       <div class="right-col">
         ${garageHTML}
         ${battHTML}
+        ${alarmCardHTML}
       </div>
     </div>
     <div class="scene-bar">${scenesHTML}</div>`;
@@ -952,7 +1029,7 @@ function bindEvents() {
     btn.addEventListener('click', e => {
       e.stopPropagation();
       const id = btn.dataset.zoneToggle;
-      ha.on(id) ? ha.hvacMode(id,'off') : ha.hvacMode(id,'fan_only');
+      ha.on(id) ? ha.turnOff(id) : ha.turnOn(id);
     });
   });
 
@@ -992,14 +1069,10 @@ function bindEvents() {
   if (alarmToggle) alarmToggle.addEventListener('click', e => { e.stopPropagation(); toggleAlarm(); });
   if (alarmCard) alarmCard.addEventListener('click', toggleAlarm);
 
-  // Scenes
+  // Scenes (one-shot action buttons, no active state)
   app.querySelectorAll('[data-scene]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const id = btn.dataset.scene;
-      const entity = btn.dataset.sceneEntity;
-      state.activeScene = state.activeScene === id ? null : id;
-      ha.scene(entity);
-      rerender();
+      ha.scene(btn.dataset.sceneEntity);
     });
   });
 
