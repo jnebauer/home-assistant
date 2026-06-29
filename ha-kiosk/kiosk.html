@@ -529,16 +529,35 @@ function liveChip(label, entity) {
   </div>`;
 }
 
-// Camera snapshot polling — refresh every 2.5s. Works through Nabu Casa cloud.
+// Camera snapshot polling using fetch+blob (allows Authorization header).
+// camera_proxy?token= requires the *camera's* access_token, not the HA long-lived token.
+// Using fetch with Bearer avoids that distinction entirely.
 let _camPollTimer = null;
+async function refreshCamImg(img) {
+  const entity = img.dataset.camEntity;
+  const haToken = sessionStorage.getItem('ha_token') || '';
+  if (!entity || !haToken) return;
+  try {
+    const res = await fetch(`/api/camera_proxy/${entity}`, {
+      headers: { 'Authorization': `Bearer ${haToken}` }
+    });
+    if (!res.ok) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const old = img.src;
+    img.src = url;
+    img.style.display = '';
+    const fallback = img.nextElementSibling;
+    if (fallback) fallback.style.display = 'none';
+    if (old && old.startsWith('blob:')) URL.revokeObjectURL(old);
+  } catch(e) {}
+}
 function startCamPolling() {
   stopCamPolling();
+  // Immediate first load
+  document.querySelectorAll('[data-cam-entity]').forEach(img => refreshCamImg(img));
   _camPollTimer = setInterval(() => {
-    document.querySelectorAll('[data-cam-snap]').forEach(img => {
-      const base = img.dataset.camSnap;
-      const token = sessionStorage.getItem('ha_token') || '';
-      img.src = `${base}?token=${encodeURIComponent(token)}&_t=${Date.now()}`;
-    });
+    document.querySelectorAll('[data-cam-entity]').forEach(img => refreshCamImg(img));
   }, 2500);
 }
 function stopCamPolling() {
@@ -553,14 +572,10 @@ function camTile(label, entity, big=false) {
   const nameCls = big ? 'big-cam-name' : 'cam-name';
   const iconCls = big ? 'big-cam-icon' : 'cam-icon';
   if (entity) {
-    const snapBase = `/api/camera_proxy/${entity}`;
-    const token = sessionStorage.getItem('ha_token') || '';
-    const initialSrc = `${snapBase}?token=${encodeURIComponent(token)}&_t=${Date.now()}`;
     return `<div class="${cls}">
-      <img src="${initialSrc}" data-cam-snap="${snapBase}"
-           style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="${iconCls}" style="display:none">${icon('cam',big?38:26,big?38:26)}</div>
+      <img data-cam-entity="${entity}"
+           style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;display:none">
+      <div class="${iconCls}">${icon('cam',big?38:26,big?38:26)}</div>
       <div class="${liveCls}"><div class="${dotCls}"></div><span class="${textCls}">LIVE</span></div>
       <div class="${nameCls}">${label}</div>
     </div>`;
