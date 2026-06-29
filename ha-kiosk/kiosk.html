@@ -1035,20 +1035,17 @@ function showGoodNightCountdown(sceneEntity) {
   ].join(';');
 
   let count = 10;
-  const render = () => {
-    overlay.innerHTML = `
-      <div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:18px">Good Night</div>
-      <div id="gn-count" style="font-size:108px;font-weight:700;line-height:1;color:var(--cyan);font-variant-numeric:tabular-nums">${count}</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.4);margin-top:14px">Leave the room — scene activates in ${count}s</div>
-      <button id="gn-cancel" style="margin-top:52px;padding:11px 38px;border-radius:99px;border:1px solid rgba(255,255,255,.18);background:transparent;color:rgba(255,255,255,.6);font-size:14px;font-family:inherit;cursor:pointer;letter-spacing:.05em">
-        Cancel
-      </button>`;
-    document.getElementById('gn-cancel').addEventListener('click', () => {
-      clearInterval(_gnTimer); _gnTimer = null; overlay.remove();
-    });
-  };
-  render();
+  overlay.innerHTML = `
+    <div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:18px">Good Night</div>
+    <div id="gn-count" style="font-size:108px;font-weight:700;line-height:1;color:var(--cyan);font-variant-numeric:tabular-nums">${count}</div>
+    <div id="gn-sub" style="font-size:13px;color:rgba(255,255,255,.4);margin-top:14px">Leave the room — scene activates in ${count}s</div>
+    <button id="gn-cancel" style="margin-top:52px;padding:11px 38px;border-radius:99px;border:1px solid rgba(255,255,255,.18);background:transparent;color:rgba(255,255,255,.6);font-size:14px;font-family:inherit;cursor:pointer;letter-spacing:.05em">
+      Cancel
+    </button>`;
   document.body.appendChild(overlay);
+  overlay.querySelector('#gn-cancel').addEventListener('click', () => {
+    clearInterval(_gnTimer); _gnTimer = null; overlay.remove();
+  });
 
   _gnTimer = setInterval(() => {
     count--;
@@ -1063,7 +1060,7 @@ function showGoodNightCountdown(sceneEntity) {
     } else {
       const el = document.getElementById('gn-count');
       if (el) el.textContent = count;
-      const sub = el && el.nextElementSibling;
+      const sub = document.getElementById('gn-sub');
       if (sub) sub.textContent = `Leave the room — scene activates in ${count}s`;
     }
   }, 1000);
