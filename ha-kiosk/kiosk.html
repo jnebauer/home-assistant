@@ -60,6 +60,8 @@ button:disabled{cursor:not-allowed}
 @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes glowAmber{0%,100%{box-shadow:0 0 7px rgba(255,174,61,.5)}50%{box-shadow:0 0 18px rgba(255,174,61,.9)}}
 @keyframes flowDash{0%{stroke-dashoffset:24}100%{stroke-dashoffset:0}}
+@keyframes efFwd{to{stroke-dashoffset:-28}}
+@keyframes efRev{to{stroke-dashoffset:28}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ============ SHARED ============ */
@@ -942,29 +944,60 @@ function renderEnergy() {
   const batKW  = C.energy.battery_power? parseFloat(ha.val(C.energy.battery_power)): null;
   const grid   = C.energy.grid_power   ? parseFloat(ha.val(C.energy.grid_power))   : null;
   const yToday = C.energy.yield_today  ? parseFloat(ha.val(C.energy.yield_today))  : null;
-  const home   = solar!==null ? Math.max(0,(solar??0)-(batKW??0)-(grid??0)) : null;
   const pending = solar === null;
 
-  // SVG flow diagram
-  function node(x,y,label,val,unit,color) {
-    return `<g transform="translate(${x},${y})">
-      <rect x="-50" y="-33" width="100" height="68" rx="11" fill="rgba(255,255,255,.06)" stroke="${color}55" stroke-width="1"/>
-      <text x="0" y="-10" text-anchor="middle" fill="var(--tm)" font-size="9.5" font-weight="700" letter-spacing="1" font-family="Manrope,sans-serif">${label}</text>
-      <text x="0" y="16" text-anchor="middle" fill="${color}" font-size="20" font-weight="700" font-family="'Space Grotesk',sans-serif">${pending?'—':val}</text>
-      <text x="0" y="31" text-anchor="middle" fill="var(--td)" font-size="10" font-family="Manrope,sans-serif">${unit}</text>
-    </g>`;
-  }
-  function flowLine(x1,y1,x2,y2,active,color) {
-    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-      stroke="${active?color:'rgba(255,255,255,.1)'}" stroke-width="2"
-      stroke-dasharray="8 4" stroke-linecap="round"
-      style="${active?'animation:flowDash 1.2s linear infinite':''}"/>`;
+  // Derived values — Sigenergy sign: battery>0=charging, grid>0=importing
+  const s = solar??0, b = batKW??0, g = grid??0;
+  const batCharging    = b > 0.1;
+  const batDischarging = b < -0.1;
+  const gridExporting  = g < -0.1;
+  const gridImporting  = g > 0.1;
+  // Home load = solar + bat_discharge + grid_import
+  const homeKW = Math.max(0, s
+    - (batCharging ? b : 0)
+    + (batDischarging ? Math.abs(b) : 0)
+    + (gridImporting ? g : 0));
+
+  // Inject animation CSS once
+  if (!document.getElementById('ef-css')) {
+    const el = document.createElement('style');
+    el.id = 'ef-css';
+    el.textContent = '@keyframes efFwd{to{stroke-dashoffset:-28}}@keyframes efRev{to{stroke-dashoffset:28}}';
+    document.head.appendChild(el);
   }
 
-  const solarVal  = solar!==null  ? solar.toFixed(1)  : '0.0';
-  const socVal    = soc!==null    ? Math.round(soc)+'%': '—';
-  const gridVal   = grid!==null   ? (grid>0?'+':'')+grid.toFixed(1) : '—';
-  const homeVal   = home!==null   ? home.toFixed(1)   : '—';
+  // Animated cable comet — speed proportional to kW, glow in cable colour
+  function cable(d, kw, color, rev) {
+    if (Math.abs(kw) < 0.1) return '';
+    const dur = Math.max(0.35, 2.0 - Math.min(kw, 6) * 0.22).toFixed(2);
+    return `<path d="${d}" stroke="${color}" stroke-width="3.5" fill="none"
+      stroke-dasharray="10 16" stroke-linecap="round" pathLength="100"
+      style="animation:${rev?'efRev':'efFwd'} ${dur}s linear infinite;filter:drop-shadow(0 0 4px ${color})"/>`;
+  }
+  // Faint static backbone
+  function staticCable(d) {
+    return `<path d="${d}" stroke="rgba(255,255,255,0.07)" stroke-width="2" fill="none" stroke-dasharray="5 10"/>`;
+  }
+  // Floating info badge (absolute-positioned inside the house container)
+  function lbl(top, left, label, val, unit, col) {
+    return `<div style="position:absolute;top:${top};left:${left};
+      background:rgba(8,16,40,0.85);border:1px solid ${col}55;border-radius:10px;
+      padding:5px 9px;min-width:70px;pointer-events:none">
+      <div style="font-size:8px;font-weight:700;letter-spacing:0.8px;color:${col};opacity:0.8;text-transform:uppercase">${label}</div>
+      <div style="font-size:15px;font-weight:700;color:${col};font-family:'Space Grotesk',sans-serif;line-height:1.2">${val}</div>
+      <div style="font-size:8px;color:rgba(255,255,255,0.45)">${unit}</div>
+    </div>`;
+  }
+
+  // Cable paths from Genergy Dashboard house card (viewBox 1170×1013, CC BY-NC-SA 4.0 SpengeSec)
+  const pSolar = 'M 475 85 L 335 270 L 505 320 L 505 570';                          // roof → junction
+  const pHome  = 'M 535 570 L 535 330 L 640 360 L 840 420 L 990 200 L 750 140';     // junction → home area
+  const pBat   = 'M 75 485 L 75 455 L 290 535 L 350 560 L 295 585 L 475 600';       // battery → junction
+  const pBatV  = 'M 350 760 L 350 570';                                              // battery vertical
+  const pGrid  = 'M 535 600 L 630 620 L 780 580 L 900 520';                         // junction → grid
+  const pMeter = 'M 600 645 L 740 695 L 790 695 L 855 680 L 855 830';               // meter path
+
+  const IMG = 'https://raw.githubusercontent.com/SpengeSec/Genergy-Dashboard/main/custom_components/genergy_dashboard/frontend/images';
 
   return `
     <div style="flex-shrink:0">
@@ -972,48 +1005,123 @@ function renderEnergy() {
       <div class="tab-sub">Live power flow</div>
     </div>
     <div class="energy-body">
-      <div class="flow-panel glass">
-        ${pending?`<div class="flow-pending">
-          <div class="flow-pending-icon">${I.bolt.replace('<svg','<svg width="32" height="32" fill="none" stroke="var(--amber)" stroke-width="1.5"')}</div>
-          <div class="flow-pending-title">Sigenergy not yet connected</div>
-          <div class="flow-pending-body">Install the Sigenergy integration in HA and add the inverter IP to see live power flow.</div>
-        </div>`:''}
-        <svg width="100%" height="100%" viewBox="0 0 270 270" style="overflow:visible">
-          ${flowLine(135,65,135,195,!pending&&solar>0,'#2dd4bf')}
-          ${flowLine(75,148,125,203,!pending&&batKW<0,'#7c83ff')}
-          ${flowLine(195,148,145,203,!pending&&grid>0,'#ffae3d')}
-          ${node(135,47,'SOLAR',solarVal,'kW','#ffae3d')}
-          ${node(57,148,'BATTERY',socVal,'','#7c83ff')}
-          ${node(213,148,'GRID',gridVal,'kW','#9fb0d8')}
-          ${node(135,220,'HOME',homeVal,'kW','#38e0ff')}
-        </svg>
-      </div>
-      <div class="energy-right">
-        <div class="solar-card" style="${pending?'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)':'background:linear-gradient(135deg,rgba(45,212,191,.18),rgba(56,224,255,.08));border:1px solid rgba(56,224,255,.28)'}">
-          <div class="label-caps">Solar Generation</div>
-          <div class="solar-val" style="color:${pending?'var(--td)':'var(--teal)'}">${pending?'—':solarVal}</div>
-          <div class="solar-unit">kW live</div>
+
+      <!-- LEFT: Isometric house with animated cable flows -->
+      <div class="flow-panel" style="padding:0;overflow:hidden;background:#0d1422;border:1px solid rgba(255,255,255,0.08)">
+        <div style="position:relative;width:100%;height:100%">
+
+          <!-- House base image -->
+          <img src="${IMG}/dark_home_has_solar_has_car.png" alt=""
+            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:center"/>
+          <!-- SigenStor battery overlay -->
+          <img src="${IMG}/sigenstor_home.png" alt=""
+            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:center"/>
+          <!-- Meter/ammeter overlay -->
+          <img src="${IMG}/ammeter_home.png" alt=""
+            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:center"/>
+
+          <!-- SVG animation overlay — viewBox matches house image (1170×1013) -->
+          <svg style="position:absolute;top:0;left:0;width:100%;height:100%"
+            viewBox="0 0 1170 1013" preserveAspectRatio="xMidYMid meet">
+
+            <!-- Static cable backbones -->
+            ${staticCable(pSolar)}
+            ${staticCable(pHome)}
+            ${staticCable(pBat)}
+            ${staticCable(pBatV)}
+            ${staticCable(pGrid)}
+            ${staticCable(pMeter)}
+
+            <!-- Solar generation: roof → junction (amber) -->
+            ${cable(pSolar, s, '#ffae3d', false)}
+
+            <!-- Home consumption: junction → home display (cyan) -->
+            ${cable(pHome, homeKW, '#38e0ff', false)}
+
+            <!-- Battery discharge: battery → junction (indigo, forward) -->
+            ${cable(pBat,  batDischarging ? Math.abs(b) : 0, '#7c83ff', false)}
+            ${cable(pBatV, batDischarging ? Math.abs(b) : 0, '#7c83ff', false)}
+
+            <!-- Battery charge: junction → battery (indigo, reverse) -->
+            ${cable(pBat,  batCharging ? b : 0, '#7c83ff', true)}
+            ${cable(pBatV, batCharging ? b : 0, '#7c83ff', true)}
+
+            <!-- Grid export: junction → grid (teal, forward) -->
+            ${cable(pGrid, gridExporting ? Math.abs(g) : 0, '#2dd4bf', false)}
+
+            <!-- Grid import: grid → junction (red, reverse) -->
+            ${cable(pGrid, gridImporting ? g : 0, '#ff5d6c', true)}
+
+          </svg>
+
+          <!-- Floating power labels positioned over house image -->
+          ${lbl('2%','33%','Solar',
+            pending ? '—' : s.toFixed(1)+' kW', 'generation', '#ffae3d')}
+          ${lbl('2%','53%','Home',
+            pending ? '—' : homeKW.toFixed(1)+' kW', 'consuming', '#38e0ff')}
+          ${lbl('70%','4%','Battery',
+            pending ? '—' : Math.round(soc??0)+'%',
+            batCharging ? '+'+b.toFixed(1)+' kW' : batDischarging ? '−'+Math.abs(b).toFixed(1)+' kW' : 'standby',
+            '#7c83ff')}
+          ${lbl('62%','70%','Grid',
+            pending ? '—' : Math.abs(g).toFixed(1)+' kW',
+            gridExporting ? 'exporting' : gridImporting ? 'importing' : 'idle',
+            gridExporting ? '#2dd4bf' : gridImporting ? '#ff5d6c' : '#9fb0d8')}
+
         </div>
+      </div>
+
+      <!-- RIGHT: Stats panel -->
+      <div class="energy-right">
+        <div class="solar-card" style="${pending
+          ? 'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)'
+          : 'background:linear-gradient(135deg,rgba(255,174,61,.18),rgba(255,174,61,.06));border:1px solid rgba(255,174,61,.28)'}">
+          <div class="label-caps" style="color:${pending?'var(--tm)':'var(--amber)'}">☀ Solar Generation</div>
+          <div class="solar-val" style="color:${pending?'var(--td)':'var(--amber)'}">${pending?'—':s.toFixed(1)}</div>
+          <div class="solar-unit">kW live · ${yToday!==null?yToday.toFixed(1):'—'} kWh today</div>
+        </div>
+
         <div class="bat-energy-card glass">
           <div style="display:flex;align-items:center;justify-content:space-between">
             <span class="label-caps">Battery</span>
-            <span style="font-size:12px;font-weight:700;color:#7c83ff">${soc!==null?Math.round(soc)+'%':'—'}${batKW!==null?' · '+(batKW>0?'+':'')+batKW.toFixed(1)+' kW':''}</span>
+            <span style="font-size:12px;font-weight:700;color:#7c83ff">${soc!==null?Math.round(soc)+'%':'—'}${Math.abs(b)>0.1?' · '+(b>0?'+':'')+b.toFixed(1)+' kW':''}</span>
           </div>
-          <div class="battery-bar-bg"><div class="battery-bar-fill" style="background:linear-gradient(90deg,#7c83ff,#a78bfa);width:${soc??0}%"></div></div>
+          <div class="battery-bar-bg" style="margin-top:6px">
+            <div class="battery-bar-fill" style="background:linear-gradient(90deg,#7c83ff,#a78bfa);width:${soc??0}%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:5px">
+            <span style="font-size:10px;color:var(--td)">${batCharging?'⚡ Charging':batDischarging?'↓ Discharging':'● Standby'}</span>
+            <span style="font-size:10px;color:var(--td)">${Math.abs(b)>0.1?Math.abs(b).toFixed(1)+' kW':''}</span>
+          </div>
         </div>
+
         <div class="energy-small-row">
           <div class="energy-small-card glass">
-            <div class="energy-small-label">Grid Export</div>
-            <div class="energy-small-val" style="color:${grid!==null&&grid<0?'var(--teal)':'var(--tm)'}">${grid!==null?Math.abs(grid).toFixed(1):'—'}</div>
-            <div class="energy-small-unit">kW</div>
+            <div class="energy-small-label">Home Use</div>
+            <div class="energy-small-val" style="color:var(--cyan)">${pending?'—':homeKW.toFixed(1)}</div>
+            <div class="energy-small-unit">kW now</div>
           </div>
           <div class="energy-small-card glass">
+            <div class="energy-small-label">Grid ${gridExporting?'Export':gridImporting?'Import':'Power'}</div>
+            <div class="energy-small-val" style="color:${gridExporting?'var(--teal)':gridImporting?'#ff5d6c':'var(--tm)'}">${pending?'—':Math.abs(g).toFixed(1)}</div>
+            <div class="energy-small-unit">kW ${gridExporting?'⬆':''}${gridImporting?'⬇':''}</div>
+          </div>
+        </div>
+
+        <div class="energy-small-row">
+          <div class="energy-small-card glass">
             <div class="energy-small-label">Yield Today</div>
-            <div class="energy-small-val" style="color:${yToday!==null?'var(--amber)':'var(--tm)'}">${yToday!==null?yToday.toFixed(1):'—'}</div>
+            <div class="energy-small-val" style="color:var(--amber)">${yToday!==null?yToday.toFixed(1):'—'}</div>
             <div class="energy-small-unit">kWh</div>
+          </div>
+          <div class="energy-small-card glass">
+            <div class="energy-small-label">Self-Use</div>
+            <div class="energy-small-val" style="color:var(--indigo)">${pending||s<0.1?'—':Math.min(100,Math.round((homeKW/s)*100))}</div>
+            <div class="energy-small-unit">% solar</div>
           </div>
         </div>
       </div>
+
     </div>`;
 }
 
